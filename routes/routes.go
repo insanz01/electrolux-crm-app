@@ -46,7 +46,7 @@ func Init() *echo.Echo {
 	e.DELETE("/gift_claims/:id", giftController.Delete)
 
 	e.POST("/files", fileController.Upload)
-	e.GET("/files/:filename", fileController.GetFile)
+	e.GET("/files/:uuid", fileController.GetFile)
 
 	e.GET("/test-struct-validation", controllers.TestStructValidation)
 	e.GET("/test-variable-validation", controllers.TestVariableValidation)

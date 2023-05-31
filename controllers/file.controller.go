@@ -105,13 +105,25 @@ func (fc *fileController) Upload(c echo.Context) error {
 
 func (fc *fileController) GetFile(c echo.Context) error {
 	// Mendapatkan nama file dari URL parameter
-	filename := c.Param("filename")
+	uuid := c.Param("uuid")
+
+	if uuid == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "invalid parameter request",
+			"data":    nil,
+		})
+	}
 
 	// Menentukan direktori aset file
 	assetDir := "uploads"
 
+	uploadedFile, err := fc.fileService.GetDocument(c, uuid)
+	if err != nil {
+		return c.Stream(http.StatusInternalServerError, "application/octet-stream", nil)
+	}
+
 	// Menggabungkan direktori aset dengan nama file
-	filepath := filepath.Join(assetDir, filename)
+	filepath := filepath.Join(assetDir, uploadedFile.Filename)
 
 	// Membuka file
 	file, err := os.Open(filepath)
