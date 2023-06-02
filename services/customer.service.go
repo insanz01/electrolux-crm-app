@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
@@ -10,7 +12,9 @@ import (
 type CustomerService interface {
 	FindAll(c echo.Context) (*dto.CustomerResponse, error)
 	FindById(c echo.Context, uuid string) (*dto.CustomerResponse, error)
-	Insert(c echo.Context, customer models.CustomerInsert) (dto.CustomerResponse, error)
+	FindByIdWithPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties, id string) (*dto.CustomerResponse, error)
+	FindByPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties) (*dto.CustomerResponse, error)
+	// Insert(c echo.Context, customer models.CustomerInsert) (dto.CustomerResponse, error)
 	Update(c echo.Context, customer dto.CustomerUpdateRequest, uuid string) (*dto.CustomerResponse, error)
 	Delete(c echo.Context, uuid string) error
 }
@@ -63,9 +67,45 @@ func (cs *customerService) FindAll(c echo.Context) (*dto.CustomerResponse, error
 	}, nil
 }
 
+func (cs *customerService) FindByPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties) (*dto.CustomerResponse, error) {
+	customers, err := cs.repository.GetAllWithFilter(customerProperties)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	groupedCustomers := make(map[string][]*models.CustomerProperties)
+	for _, customer := range customers {
+		groupId := customer.TableDataID
+		groupedCustomers[groupId] = append(groupedCustomers[groupId], customer)
+	}
+
+	return &dto.CustomerResponse{
+		Customer: groupedCustomers,
+	}, nil
+}
+
 func (cs *customerService) FindById(c echo.Context, uuid string) (*dto.CustomerResponse, error) {
 	customer, err := cs.repository.GetSingle(uuid)
 	if err != nil {
+		return nil, err
+	}
+
+	groupedCustomers := make(map[string][]*models.CustomerProperties)
+	for _, customer := range customer {
+		groupId := customer.TableDataID
+		groupedCustomers[groupId] = append(groupedCustomers[groupId], customer)
+	}
+
+	return &dto.CustomerResponse{
+		Customer: groupedCustomers,
+	}, nil
+}
+
+func (cs *customerService) FindByIdWithPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties, id string) (*dto.CustomerResponse, error) {
+	customer, err := cs.repository.GetSingleCustomerWithFilter(customerProperties, id)
+	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 

@@ -17,3 +17,13 @@ type CustomerRequest struct {
 type CustomerUpdateRequest struct {
 	Customers []CustomerRequest `json:"customer"`
 }
+
+type CustomerFilter struct {
+	Property string `json:"property"`
+	Value    string `json:"value"`
+}
+
+type CustomerProperties struct {
+	Properties []string         `json:"properties,omitempty"`
+	Filters    []CustomerFilter `json:"filters,omitempty"`
+}

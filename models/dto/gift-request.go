@@ -17,3 +17,8 @@ type GiftClaimRequest struct {
 type GiftClaimUpdateRequest struct {
 	GiftClaims []GiftClaimRequest `json:"gift_claim"`
 }
+
+type GiftClaimProperties struct {
+	Properties []string         `json:"properties,omitempty"`
+	Filters    []CustomerFilter `json:"filters,omitempty"`
+}

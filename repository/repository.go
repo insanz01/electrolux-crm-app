@@ -19,6 +19,8 @@ type (
 		LoginRepository
 		CustomerRepository
 		GiftRepository
+		ChannelRepository
+		CampaignRepository
 	}
 )
 

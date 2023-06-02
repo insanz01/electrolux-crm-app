@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -28,22 +29,49 @@ func NewCustomerController(service services.CustomerService) CustomerController 
 }
 
 func (cc *customerController) FindAll(c echo.Context) error {
-	customers, err := cc.customerService.FindAll(c)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, echo.Map{
-			"message": "error",
-			"data":    nil,
+	customerProperties := dto.CustomerProperties{}
+
+	c.Bind(&customerProperties)
+
+	if customerProperties.Properties == nil {
+		customers, err := cc.customerService.FindAll(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, echo.Map{
+				"message": "error",
+				"data":    nil,
+			})
+			return nil
+		}
+
+		c.JSON(http.StatusOK, echo.Map{
+			"message": "success",
+			"data":    customers,
 		})
-		return nil
+	} else {
+		fmt.Println("Masuk ke sini")
+		customers, err := cc.customerService.FindByPropsOrFilter(c, customerProperties)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, echo.Map{
+				"message": "error",
+				"data":    nil,
+			})
+			return nil
+		}
+
+		c.JSON(http.StatusOK, echo.Map{
+			"message": "success",
+			"data":    customers,
+		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    customers,
-	})
+	return nil
 }
 
 func (cc *customerController) FindById(c echo.Context) error {
+
+	customerProperties := dto.CustomerProperties{}
+
+	c.Bind(&customerProperties)
 
 	customerId := c.Param("id")
 
@@ -54,7 +82,22 @@ func (cc *customerController) FindById(c echo.Context) error {
 		})
 	}
 
-	customer, err := cc.customerService.FindById(c, customerId)
+	if customerProperties.Properties == nil && customerProperties.Filters == nil {
+		customer, err := cc.customerService.FindById(c, customerId)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "can't get data from db",
+				"data":    nil,
+			})
+		}
+
+		return c.JSON(http.StatusOK, echo.Map{
+			"message": "success",
+			"data":    customer,
+		})
+	}
+
+	customer, err := cc.customerService.FindByIdWithPropsOrFilter(c, customerProperties, customerId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "can't get data from db",
