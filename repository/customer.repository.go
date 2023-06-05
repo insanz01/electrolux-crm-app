@@ -40,9 +40,43 @@ func (r *Repository) GetAll() ([]*models.CustomerProperties, error) {
 
 func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
 	var customers []*models.CustomerProperties
+	var filterValueQuery []string
+
+	finalQuery := getAllWithFilterQuery
+
+	useFilter := false
+
+	if properties.Filters != nil {
+		for _, filter := range properties.Filters {
+			properties.Properties = append(properties.Properties, filter.Property)
+			filterValueQuery = append(filterValueQuery, filter.Value)
+		}
+
+		finalQuery = fmt.Sprintf("%s AND public.properties.value IN (?)", finalQuery)
+
+		useFilter = true
+	}
+
+	if useFilter {
+		// Persiapan query
+		query, args, err := sqlx.In(finalQuery, properties.Properties, filterValueQuery)
+		if err != nil {
+			return nil, err
+		}
+
+		query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+		// Eksekusi query
+		err = r.db.Select(&customers, query, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		return customers, err
+	}
 
 	// Persiapan query
-	query, args, err := sqlx.In(getAllWithFilterQuery, properties.Properties)
+	query, args, err := sqlx.In(finalQuery, properties.Properties)
 	if err != nil {
 		return nil, err
 	}
