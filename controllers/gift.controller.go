@@ -5,7 +5,7 @@ import (
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type GiftController interface {
@@ -28,6 +28,27 @@ func NewGiftController(service services.GiftService) GiftController {
 }
 
 func (gc *giftController) FindAll(c echo.Context) error {
+
+	giftClaimProperties := dto.GiftClaimProperties{}
+
+	c.Bind(&giftClaimProperties)
+
+	if giftClaimProperties.Properties == nil {
+		giftClaims, err := gc.giftService.FindAll(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, echo.Map{
+				"message": "error",
+				"data":    nil,
+			})
+			return nil
+		}
+
+		return c.JSON(http.StatusOK, echo.Map{
+			"message": "success",
+			"data":    giftClaims,
+		})
+	}
+
 	giftClaims, err := gc.giftService.FindAll(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{

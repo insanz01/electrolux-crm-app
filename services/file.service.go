@@ -6,7 +6,7 @@ import (
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type FileService interface {

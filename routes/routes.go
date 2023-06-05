@@ -8,9 +8,25 @@ import (
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 
-	"github.com/labstack/echo"
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	"github.com/labstack/echo/v4"
 )
 
+// @title Swagger API Electrolux
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host petstore.swagger.io
+// @BasePath /api/v1
 func Init() *echo.Echo {
 	e := echo.New()
 
@@ -27,29 +43,33 @@ func Init() *echo.Echo {
 	fileController := controllers.NewFileController(fileService)
 	giftController := controllers.NewGiftController(giftService)
 
-	e.GET("/", func(c echo.Context) error {
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	api := e.Group("api/v1")
+
+	api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, this is echo!")
 	})
 
-	e.GET("/generate-hash/:password", loginController.GenerateHashPassword)
-	e.POST("/login", loginController.CheckLogin)
+	api.GET("/generate-hash/:password", loginController.GenerateHashPassword)
+	api.POST("/login", loginController.CheckLogin)
 
-	// e.POST("/customer", customerController.)
-	e.GET("/customers", customerController.FindAll)
-	e.GET("/customers/:id", customerController.FindById)
-	e.PUT("/customers/:id", customerController.Update)
-	e.DELETE("/customers/:id", customerController.Delete)
+	// api.POST("/customer", customerController.)
+	api.GET("/customers", customerController.FindAll)
+	api.GET("/customers/:id", customerController.FindById)
+	api.PUT("/customers/:id", customerController.Update)
+	api.DELETE("/customers/:id", customerController.Delete)
 
-	e.GET("/gift_claims", giftController.FindAll)
-	e.GET("/gift_claims/:id", giftController.FindById)
-	e.PUT("/gift_claims/:id", giftController.Update)
-	e.DELETE("/gift_claims/:id", giftController.Delete)
+	api.GET("/gift_claims", giftController.FindAll)
+	api.GET("/gift_claims/:id", giftController.FindById)
+	api.PUT("/gift_claims/:id", giftController.Update)
+	api.DELETE("/gift_claims/:id", giftController.Delete)
 
-	e.POST("/files", fileController.Upload)
-	e.GET("/files/:uuid", fileController.GetFile)
+	api.POST("/files", fileController.Upload)
+	api.GET("/files/:uuid", fileController.GetFile)
 
-	e.GET("/test-struct-validation", controllers.TestStructValidation)
-	e.GET("/test-variable-validation", controllers.TestVariableValidation)
+	api.GET("/test-struct-validation", controllers.TestStructValidation)
+	api.GET("/test-variable-validation", controllers.TestVariableValidation)
 
 	return e
 }

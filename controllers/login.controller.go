@@ -9,7 +9,7 @@ import (
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/helpers"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type LoginController interface {
