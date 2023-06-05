@@ -115,6 +115,11 @@ func (gs *giftService) Update(c echo.Context, giftClaim dto.GiftClaimUpdateReque
 		return nil, err
 	}
 
+	err = gs.repository.UpdateDate(uuid)
+	if err != nil {
+		return nil, err
+	}
+
 	singleGiftClaim, err := gs.repository.GetSingleGiftClaim(uuid)
 	if err != nil {
 		return nil, err

@@ -145,6 +145,11 @@ func (cs *customerService) Update(c echo.Context, customer dto.CustomerUpdateReq
 		return nil, err
 	}
 
+	err = cs.repository.UpdateDate(uuid)
+	if err != nil {
+		return nil, err
+	}
+
 	singleCustomer, err := cs.repository.GetSingle(uuid)
 	if err != nil {
 		return nil, err
