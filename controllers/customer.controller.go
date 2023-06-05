@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
@@ -45,21 +44,25 @@ func (cc *customerController) FindAll(c echo.Context) error {
 		customers, err := cc.customerService.FindAll(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, echo.Map{
+				"status":  0,
 				"message": "error",
 				"data":    nil,
 			})
 			return nil
 		}
 
-		c.JSON(http.StatusOK, echo.Map{
-			"message": "success",
-			"data":    customers,
-		})
+		webResponse := models.Response{
+			Status:  1,
+			Message: "success",
+			Data:    customers,
+		}
+
+		c.JSON(http.StatusOK, webResponse)
 	} else {
-		fmt.Println("Masuk ke sini")
 		customers, err := cc.customerService.FindByPropsOrFilter(c, customerProperties)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, echo.Map{
+				"status":  0,
 				"message": "error",
 				"data":    nil,
 			})
@@ -96,6 +99,7 @@ func (cc *customerController) FindById(c echo.Context) error {
 
 	if customerId == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": "invalid parameter request",
 			"data":    nil,
 		})
@@ -105,20 +109,25 @@ func (cc *customerController) FindById(c echo.Context) error {
 		customer, err := cc.customerService.FindById(c, customerId)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"status":  0,
 				"message": "can't get data from db",
 				"data":    nil,
 			})
 		}
 
-		return c.JSON(http.StatusOK, echo.Map{
-			"message": "success",
-			"data":    customer,
-		})
+		webResponse := models.Response{
+			Status:  1,
+			Message: "success",
+			Data:    customer,
+		}
+
+		return c.JSON(http.StatusOK, webResponse)
 	}
 
 	customer, err := cc.customerService.FindByIdWithPropsOrFilter(c, customerProperties, customerId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"status":  0,
 			"message": "can't get data from db",
 			"data":    nil,
 		})
@@ -148,6 +157,7 @@ func (cc *customerController) Update(c echo.Context) error {
 	customerId := c.Param("id")
 	if customerId == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": "invalid request param",
 			"data":    nil,
 		})
@@ -156,6 +166,7 @@ func (cc *customerController) Update(c echo.Context) error {
 	err := c.Bind(&customerRequest)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": "can't fetch data from request",
 			"data":    nil,
 		})
@@ -164,6 +175,7 @@ func (cc *customerController) Update(c echo.Context) error {
 	customerResponse, err := cc.customerService.Update(c, customerRequest, customerId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"status":  0,
 			"message": "can't get data from db",
 			"data":    nil,
 		})
@@ -189,6 +201,7 @@ func (cc *customerController) Delete(c echo.Context) error {
 	customerId := c.Param("id")
 	if customerId == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": "invalid request param",
 			"data":    nil,
 		})
@@ -197,6 +210,7 @@ func (cc *customerController) Delete(c echo.Context) error {
 	err := cc.customerService.Delete(c, customerId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"status":  0,
 			"message": "can't remove data from db",
 			"data":    nil,
 		})
