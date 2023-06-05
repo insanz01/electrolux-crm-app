@@ -28,6 +28,13 @@ func NewCustomerController(service services.CustomerService) CustomerController 
 	}
 }
 
+// GetAllCustomer		godoc
+// @Summary			Get All Customers
+// @Description		Get All Customer from Db.
+// @Produce			application/json
+// @Tags			customer
+// @Success			200 {object} response.Response{}
+// @Router			/customers [get]
 func (cc *customerController) FindAll(c echo.Context) error {
 	customerProperties := dto.CustomerProperties{}
 
@@ -67,6 +74,14 @@ func (cc *customerController) FindAll(c echo.Context) error {
 	return nil
 }
 
+// FindByIdCustomer 		godoc
+// @Summary				Get Single customer by id.
+// @Param				customerId path string true "get customer by id"
+// @Description			Return the customers whoes customer value mathes id.
+// @Produce				application/json
+// @Tags				customers
+// @Success				200 {object} response.Response{}
+// @Router				/customers/{customerId} [get]
 func (cc *customerController) FindById(c echo.Context) error {
 
 	customerProperties := dto.CustomerProperties{}
@@ -111,6 +126,15 @@ func (cc *customerController) FindById(c echo.Context) error {
 	})
 }
 
+// UpdateCustomer		godoc
+// @Summary			Update customers
+// @Description		Update customers data.
+// @Param			tagId path string true "update customers by id"
+// @Param			customers body request.CreateTagsRequest true  "Update customers"
+// @Tags			customers
+// @Produce			application/json
+// @Success			200 {object} response.Response{}
+// @Router			/customers/{tagId} [patch]
 func (cc *customerController) Update(c echo.Context) error {
 	customerRequest := dto.CustomerUpdateRequest{}
 
@@ -144,6 +168,13 @@ func (cc *customerController) Update(c echo.Context) error {
 	})
 }
 
+// DeleteCustomers		godoc
+// @Summary			Delete customers
+// @Description		Remove customers data by id.
+// @Produce			application/json
+// @Tags			customers
+// @Success			200 {object} response.Response{}
+// @Router			/customers/{tagID} [delete]
 func (cc *customerController) Delete(c echo.Context) error {
 	customerId := c.Param("id")
 	if customerId == "" {

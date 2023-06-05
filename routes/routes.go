@@ -25,7 +25,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io
+// @host localhost:1234
 // @BasePath /api/v1
 func Init() *echo.Echo {
 	e := echo.New()
