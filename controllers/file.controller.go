@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -55,7 +54,6 @@ func (fc *fileController) Upload(c echo.Context) error {
 	// Membuka file yang diterima
 	src, err := fileUpload.File.Open()
 	if err != nil {
-		fmt.Println("gagal 1")
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
 			"message": err.Error,
@@ -74,7 +72,6 @@ func (fc *fileController) Upload(c echo.Context) error {
 	dstPath := filepath.Join(dstDir, fileUpload.File.Filename)
 	dst, err := os.Create(dstPath)
 	if err != nil {
-		fmt.Println("gagal 2")
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
 			"message": err.Error,
@@ -85,7 +82,6 @@ func (fc *fileController) Upload(c echo.Context) error {
 
 	// Menyalin isi file ke file tujuan
 	if _, err = io.Copy(dst, src); err != nil {
-		fmt.Println("gagal 3")
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
 			"message": err.Error,
@@ -95,7 +91,6 @@ func (fc *fileController) Upload(c echo.Context) error {
 
 	fileResponse, err := fc.fileService.Insert(c, fileUpload)
 	if err != nil {
-		fmt.Println("gagal 4")
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
 			"message": err.Error,

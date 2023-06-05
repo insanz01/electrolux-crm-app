@@ -38,11 +38,13 @@ func Init() *echo.Echo {
 	customerService := services.NewCustomerService(repo)
 	fileService := services.NewFileService(repo)
 	giftService := services.NewGiftService(repo)
+	campaignService := services.NewCampaignService(repo)
 
 	loginController := controllers.NewLoginController(repo)
 	customerController := controllers.NewCustomerController(customerService)
 	fileController := controllers.NewFileController(fileService)
 	giftController := controllers.NewGiftController(giftService)
+	campaignController := controllers.NewCampaignController(campaignService)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
@@ -65,6 +67,10 @@ func Init() *echo.Echo {
 	api.GET("/gift_claims/:id", giftController.FindById)
 	api.PUT("/gift_claims/:id", giftController.Update)
 	api.DELETE("/gift_claims/:id", giftController.Delete)
+
+	api.GET("/campaigns", campaignController.FindAll)
+	api.GET("/campaigns/:id", campaignController.FindById)
+	api.POST("/campaigns", campaignController.Insert)
 
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)

@@ -9,7 +9,7 @@ import (
 
 type CampaignRepository interface {
 	GetAllCampaign() ([]*models.Campaign, error)
-	GetSingleCampaign(id string) ([]*models.Campaign, error)
+	GetSingleCampaign(id string) (*models.Campaign, error)
 	InsertCampaign(campaign dto.CampaignInsertRequest) (string, error)
 }
 
