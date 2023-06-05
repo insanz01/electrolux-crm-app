@@ -57,7 +57,7 @@ func (gc *giftController) FindAll(c echo.Context) error {
 		})
 	}
 
-	giftClaims, err := gc.giftService.FindAll(c)
+	giftClaims, err := gc.giftService.FindByPropsOrFilter(c, giftClaimProperties)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{
 			"message": "error",
@@ -85,6 +85,10 @@ func (gc *giftController) FindAll(c echo.Context) error {
 // @Router				/gift_claims/{giftClaimId} [get]
 func (gc *giftController) FindById(c echo.Context) error {
 
+	giftProperties := dto.GiftClaimProperties{}
+
+	c.Bind(&giftProperties)
+
 	giftClaimId := c.Param("id")
 
 	if giftClaimId == "" {
@@ -94,7 +98,25 @@ func (gc *giftController) FindById(c echo.Context) error {
 		})
 	}
 
-	giftClaim, err := gc.giftService.FindById(c, giftClaimId)
+	if giftProperties.Properties == nil && giftProperties.Filters == nil {
+		giftClaim, err := gc.giftService.FindById(c, giftClaimId)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"message": "can't get data from db",
+				"data":    nil,
+			})
+		}
+
+		webResponse := models.Response{
+			Status:  1,
+			Message: "success",
+			Data:    giftClaim,
+		}
+
+		return c.JSON(http.StatusOK, webResponse)
+	}
+
+	giftClaim, err := gc.giftService.FindByIdWithPropsOrFilter(c, giftProperties, giftClaimId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "can't get data from db",

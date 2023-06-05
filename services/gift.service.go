@@ -9,7 +9,7 @@ import (
 
 type GiftService interface {
 	FindAll(c echo.Context) (*dto.GiftClaimResponse, error)
-	FindByPropsOrFilter(c echo.Context, customerProperties dto.GiftClaimProperties) (*dto.GiftClaimResponse, error)
+	FindByPropsOrFilter(c echo.Context, giftClaimResponse dto.GiftClaimProperties) (*dto.GiftClaimResponse, error)
 	FindById(c echo.Context, uuid string) (*dto.GiftClaimResponse, error)
 	FindByIdWithPropsOrFilter(c echo.Context, giftProperties dto.GiftClaimProperties, uuid string) (*dto.GiftClaimResponse, error)
 	Update(c echo.Context, giftClaim dto.GiftClaimUpdateRequest, uuid string) (*dto.GiftClaimResponse, error)
