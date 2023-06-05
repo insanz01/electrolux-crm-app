@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 	"github.com/labstack/echo/v4"
@@ -33,7 +34,7 @@ func NewCustomerController(service services.CustomerService) CustomerController 
 // @Description		Get All Customer from Db.
 // @Produce			application/json
 // @Tags			customer
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/customers [get]
 func (cc *customerController) FindAll(c echo.Context) error {
 	customerProperties := dto.CustomerProperties{}
@@ -65,10 +66,13 @@ func (cc *customerController) FindAll(c echo.Context) error {
 			return nil
 		}
 
-		c.JSON(http.StatusOK, echo.Map{
-			"message": "success",
-			"data":    customers,
-		})
+		webResponse := models.Response{
+			Status:  1,
+			Message: "success",
+			Data:    customers,
+		}
+
+		c.JSON(http.StatusOK, webResponse)
 	}
 
 	return nil
@@ -80,7 +84,7 @@ func (cc *customerController) FindAll(c echo.Context) error {
 // @Description			Return the customers whoes customer value mathes id.
 // @Produce				application/json
 // @Tags				customers
-// @Success				200 {object} response.Response{}
+// @Success				200 {object} models.Response{}
 // @Router				/customers/{customerId} [get]
 func (cc *customerController) FindById(c echo.Context) error {
 
@@ -120,20 +124,23 @@ func (cc *customerController) FindById(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    customer,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    customer,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 // UpdateCustomer		godoc
 // @Summary			Update customers
 // @Description		Update customers data.
-// @Param			customerId path string true "update customers by id"
-// @Param			customers body request.CustomerUpdateRequest true  "Update customers"
+// @Param			id path string true "update customers by id"
+// @Param			customers body dto.CustomerUpdateRequest true  "Update customers"
 // @Tags			customers
 // @Produce			application/json
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/customers/{customerId} [put]
 func (cc *customerController) Update(c echo.Context) error {
 	customerRequest := dto.CustomerUpdateRequest{}
@@ -162,10 +169,13 @@ func (cc *customerController) Update(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    customerResponse,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    customerResponse,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 // DeleteCustomers		godoc
@@ -173,7 +183,7 @@ func (cc *customerController) Update(c echo.Context) error {
 // @Description		Remove customers data by id.
 // @Produce			application/json
 // @Tags			customers
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/customers/{customerId} [delete]
 func (cc *customerController) Delete(c echo.Context) error {
 	customerId := c.Param("id")
@@ -192,8 +202,11 @@ func (cc *customerController) Delete(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    nil,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    nil,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }

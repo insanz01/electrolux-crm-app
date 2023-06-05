@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 	"github.com/labstack/echo/v4"
@@ -32,7 +33,7 @@ func NewGiftController(service services.GiftService) GiftController {
 // @Description		Get All Gift Claims from Db.
 // @Produce			application/json
 // @Tags			gift_claims
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/gift_claims [get]
 func (gc *giftController) FindAll(c echo.Context) error {
 
@@ -65,10 +66,13 @@ func (gc *giftController) FindAll(c echo.Context) error {
 		return nil
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    giftClaims,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    giftClaims,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 // FindByIdGiftClaim 		godoc
@@ -77,7 +81,7 @@ func (gc *giftController) FindAll(c echo.Context) error {
 // @Description			Return the gift claims whoes gift claim value mathes id.
 // @Produce				application/json
 // @Tags				gift_claims
-// @Success				200 {object} response.Response{}
+// @Success				200 {object} models.Response{}
 // @Router				/gift_claims/{giftClaimId} [get]
 func (gc *giftController) FindById(c echo.Context) error {
 
@@ -98,20 +102,23 @@ func (gc *giftController) FindById(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    giftClaim,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    giftClaim,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 // UpdateGiftClaim		godoc
 // @Summary			Update gift_claims
 // @Description		Update gift_claims data.
 // @Param			giftClaimId path string true "update gift_claims by id"
-// @Param			gift_claims body request.GiftClaimUpdateRequest true  "Update gift_claims"
+// @Param			gift_claims body dto.GiftClaimUpdateRequest true  "Update gift_claims"
 // @Tags			gift_claims
 // @Produce			application/json
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/gift_claims/{giftClaimId} [put]
 func (gc *giftController) Update(c echo.Context) error {
 	giftClaimRequest := dto.GiftClaimUpdateRequest{}
@@ -140,10 +147,13 @@ func (gc *giftController) Update(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    giftClaimResponse,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    giftClaimResponse,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 // DeleteGiftClaims		godoc
@@ -151,7 +161,7 @@ func (gc *giftController) Update(c echo.Context) error {
 // @Description		Remove gift_claims data by id.
 // @Produce			application/json
 // @Tags			gift_claims
-// @Success			200 {object} response.Response{}
+// @Success			200 {object} models.Response{}
 // @Router			/gift_claims/{gift_claimId} [delete]
 func (gc *giftController) Delete(c echo.Context) error {
 	giftClaimId := c.Param("id")
@@ -170,8 +180,11 @@ func (gc *giftController) Delete(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"message": "success",
-		"data":    nil,
-	})
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    nil,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }

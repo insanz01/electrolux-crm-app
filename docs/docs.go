@@ -15,7 +15,304 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/customers": {
+            "get": {
+                "description": "Get All Customer from Db.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get All Customers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/{customerId}": {
+            "get": {
+                "description": "Return the customers whoes customer value mathes id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Get Single customer by id.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "get customer by id",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update customers data.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Update customers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "update customers by id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update customers",
+                        "name": "customers",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CustomerUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove customers data by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Delete customers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/gift_claims": {
+            "get": {
+                "description": "Get All Gift Claims from Db.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gift_claims"
+                ],
+                "summary": "Get All Gift Claims",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/gift_claims/{giftClaimId}": {
+            "get": {
+                "description": "Return the gift claims whoes gift claim value mathes id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gift_claims"
+                ],
+                "summary": "Get Single Gift Claim by id.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "get gift claim by id",
+                        "name": "giftClaimId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update gift_claims data.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gift_claims"
+                ],
+                "summary": "Update gift_claims",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "update gift_claims by id",
+                        "name": "giftClaimId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update gift_claims",
+                        "name": "gift_claims",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GiftClaimUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/gift_claims/{gift_claimId}": {
+            "delete": {
+                "description": "Remove gift_claims data by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gift_claims"
+                ],
+                "summary": "Delete gift_claims",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CustomerRequest": {
+            "type": "object",
+            "properties": {
+                "datatype": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "input_type": {
+                    "type": "string"
+                },
+                "is_mandatory": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CustomerUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "customer": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CustomerRequest"
+                    }
+                }
+            }
+        },
+        "dto.GiftClaimRequest": {
+            "type": "object",
+            "properties": {
+                "datatype": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "input_type": {
+                    "type": "string"
+                },
+                "is_mandatory": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GiftClaimUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "gift_claim": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GiftClaimRequest"
+                    }
+                }
+            }
+        },
+        "models.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

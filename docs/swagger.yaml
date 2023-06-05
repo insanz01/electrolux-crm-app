@@ -1,4 +1,198 @@
+definitions:
+  dto.CustomerRequest:
+    properties:
+      datatype:
+        type: string
+      id:
+        type: string
+      input_type:
+        type: string
+      is_mandatory:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  dto.CustomerUpdateRequest:
+    properties:
+      customer:
+        items:
+          $ref: '#/definitions/dto.CustomerRequest'
+        type: array
+    type: object
+  dto.GiftClaimRequest:
+    properties:
+      datatype:
+        type: string
+      id:
+        type: string
+      input_type:
+        type: string
+      is_mandatory:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  dto.GiftClaimUpdateRequest:
+    properties:
+      gift_claim:
+        items:
+          $ref: '#/definitions/dto.GiftClaimRequest'
+        type: array
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /customers:
+    get:
+      description: Get All Customer from Db.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get All Customers
+      tags:
+      - customer
+  /customers/{customerId}:
+    delete:
+      description: Remove customers data by id.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Delete customers
+      tags:
+      - customers
+    get:
+      description: Return the customers whoes customer value mathes id.
+      parameters:
+      - description: get customer by id
+        in: path
+        name: customerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get Single customer by id.
+      tags:
+      - customers
+    put:
+      description: Update customers data.
+      parameters:
+      - description: update customers by id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update customers
+        in: body
+        name: customers
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CustomerUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update customers
+      tags:
+      - customers
+  /gift_claims:
+    get:
+      description: Get All Gift Claims from Db.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get All Gift Claims
+      tags:
+      - gift_claims
+  /gift_claims/{gift_claimId}:
+    delete:
+      description: Remove gift_claims data by id.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Delete gift_claims
+      tags:
+      - gift_claims
+  /gift_claims/{giftClaimId}:
+    get:
+      description: Return the gift claims whoes gift claim value mathes id.
+      parameters:
+      - description: get gift claim by id
+        in: path
+        name: giftClaimId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get Single Gift Claim by id.
+      tags:
+      - gift_claims
+    put:
+      description: Update gift_claims data.
+      parameters:
+      - description: update gift_claims by id
+        in: path
+        name: giftClaimId
+        required: true
+        type: string
+      - description: Update gift_claims
+        in: body
+        name: gift_claims
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GiftClaimUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update gift_claims
+      tags:
+      - gift_claims
 swagger: "2.0"
