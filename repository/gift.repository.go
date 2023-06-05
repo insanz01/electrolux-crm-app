@@ -38,7 +38,7 @@ func (r *Repository) GetAllGiftClaim() ([]*models.GiftProperties, error) {
 	return giftClaims, nil
 }
 
-func (r *Repository) GetAllGiftClaimWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
+func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimProperties) ([]*models.CustomerProperties, error) {
 	var customers []*models.CustomerProperties
 
 	// Persiapan query
@@ -74,7 +74,7 @@ func (r *Repository) GetSingleGiftClaim(id string) ([]*models.GiftProperties, er
 	return giftClaims, nil
 }
 
-func (r *Repository) GetSingleGiftClaimWithFilter(props dto.CustomerProperties, id string) ([]*models.CustomerProperties, error) {
+func (r *Repository) GetSingleGiftClaimWithFilter(props dto.GiftClaimProperties, id string) ([]*models.CustomerProperties, error) {
 	var giftClaim []*models.CustomerProperties
 
 	// Persiapan query

@@ -11,9 +11,9 @@ import (
 
 type CustomerService interface {
 	FindAll(c echo.Context) (*dto.CustomerResponse, error)
+	FindByPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties) (*dto.CustomerResponse, error)
 	FindById(c echo.Context, uuid string) (*dto.CustomerResponse, error)
 	FindByIdWithPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties, id string) (*dto.CustomerResponse, error)
-	FindByPropsOrFilter(c echo.Context, customerProperties dto.CustomerProperties) (*dto.CustomerResponse, error)
 	// Insert(c echo.Context, customer models.CustomerInsert) (dto.CustomerResponse, error)
 	Update(c echo.Context, customer dto.CustomerUpdateRequest, uuid string) (*dto.CustomerResponse, error)
 	Delete(c echo.Context, uuid string) error
@@ -162,7 +162,6 @@ func (cs *customerService) Update(c echo.Context, customer dto.CustomerUpdateReq
 }
 
 func (cs *customerService) Delete(c echo.Context, uuid string) error {
-
 	err := cs.repository.DeleteCustomer(uuid)
 	if err != nil {
 		return err

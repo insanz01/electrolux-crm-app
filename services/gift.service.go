@@ -9,7 +9,9 @@ import (
 
 type GiftService interface {
 	FindAll(c echo.Context) (*dto.GiftClaimResponse, error)
+	FindByPropsOrFilter(c echo.Context, customerProperties dto.GiftClaimProperties) (*dto.GiftClaimResponse, error)
 	FindById(c echo.Context, uuid string) (*dto.GiftClaimResponse, error)
+	FindByIdWithPropsOrFilter(c echo.Context, giftProperties dto.GiftClaimProperties, uuid string) (*dto.GiftClaimResponse, error)
 	Update(c echo.Context, giftClaim dto.GiftClaimUpdateRequest, uuid string) (*dto.GiftClaimResponse, error)
 	Delete(c echo.Context, uuid string) error
 }
@@ -42,6 +44,23 @@ func (gs *giftService) FindAll(c echo.Context) (*dto.GiftClaimResponse, error) {
 	}, nil
 }
 
+func (gs *giftService) FindByPropsOrFilter(c echo.Context, giftProperties dto.GiftClaimProperties) (*dto.GiftClaimResponse, error) {
+	giftClaims, err := gs.repository.GetAllGiftClaimWithFilter(giftProperties)
+	if err != nil {
+		return nil, err
+	}
+
+	groupedGiftClaims := make(map[string][]*models.CustomerProperties)
+	for _, giftClaim := range giftClaims {
+		groupId := giftClaim.TableDataID
+		groupedGiftClaims[groupId] = append(groupedGiftClaims[groupId], giftClaim)
+	}
+
+	return &dto.GiftClaimResponse{
+		GiftClaim: groupedGiftClaims,
+	}, nil
+}
+
 func (gs *giftService) FindById(c echo.Context, uuid string) (*dto.GiftClaimResponse, error) {
 	giftClaim, err := gs.repository.GetSingleGiftClaim(uuid)
 	if err != nil {
@@ -56,6 +75,23 @@ func (gs *giftService) FindById(c echo.Context, uuid string) (*dto.GiftClaimResp
 
 	return &dto.GiftClaimResponse{
 		GiftClaim: groupedGiftClaim,
+	}, nil
+}
+
+func (gs *giftService) FindByIdWithPropsOrFilter(c echo.Context, giftProperties dto.GiftClaimProperties, id string) (*dto.GiftClaimResponse, error) {
+	giftClaims, err := gs.repository.GetSingleGiftClaimWithFilter(giftProperties, id)
+	if err != nil {
+		return nil, err
+	}
+
+	groupedGiftClaims := make(map[string][]*models.CustomerProperties)
+	for _, giftClaim := range giftClaims {
+		groupId := giftClaim.TableDataID
+		groupedGiftClaims[groupId] = append(groupedGiftClaims[groupId], giftClaim)
+	}
+
+	return &dto.GiftClaimResponse{
+		GiftClaim: groupedGiftClaims,
 	}, nil
 }
 
