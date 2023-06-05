@@ -5,6 +5,7 @@ import (
 	// "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/middleware"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/controllers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/db"
+	_ "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/docs"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 
