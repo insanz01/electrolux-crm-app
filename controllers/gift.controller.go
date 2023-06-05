@@ -27,6 +27,13 @@ func NewGiftController(service services.GiftService) GiftController {
 	}
 }
 
+// GetAllGiftClaims		godoc
+// @Summary			Get All Gift Claims
+// @Description		Get All Gift Claims from Db.
+// @Produce			application/json
+// @Tags			gift_claims
+// @Success			200 {object} response.Response{}
+// @Router			/gift_claims [get]
 func (gc *giftController) FindAll(c echo.Context) error {
 
 	giftClaimProperties := dto.GiftClaimProperties{}
@@ -64,6 +71,14 @@ func (gc *giftController) FindAll(c echo.Context) error {
 	})
 }
 
+// FindByIdGiftClaim 		godoc
+// @Summary				Get Single Gift Claim by id.
+// @Param				giftClaimId path string true "get gift claim by id"
+// @Description			Return the gift claims whoes gift claim value mathes id.
+// @Produce				application/json
+// @Tags				gift_claims
+// @Success				200 {object} response.Response{}
+// @Router				/gift_claims/{giftClaimId} [get]
 func (gc *giftController) FindById(c echo.Context) error {
 
 	giftClaimId := c.Param("id")
@@ -89,6 +104,15 @@ func (gc *giftController) FindById(c echo.Context) error {
 	})
 }
 
+// UpdateGiftClaim		godoc
+// @Summary			Update gift_claims
+// @Description		Update gift_claims data.
+// @Param			giftClaimId path string true "update gift_claims by id"
+// @Param			gift_claims body request.GiftClaimUpdateRequest true  "Update gift_claims"
+// @Tags			gift_claims
+// @Produce			application/json
+// @Success			200 {object} response.Response{}
+// @Router			/gift_claims/{giftClaimId} [put]
 func (gc *giftController) Update(c echo.Context) error {
 	giftClaimRequest := dto.GiftClaimUpdateRequest{}
 
@@ -122,6 +146,13 @@ func (gc *giftController) Update(c echo.Context) error {
 	})
 }
 
+// DeleteGiftClaims		godoc
+// @Summary			Delete gift_claims
+// @Description		Remove gift_claims data by id.
+// @Produce			application/json
+// @Tags			gift_claims
+// @Success			200 {object} response.Response{}
+// @Router			/gift_claims/{gift_claimId} [delete]
 func (gc *giftController) Delete(c echo.Context) error {
 	giftClaimId := c.Param("id")
 	if giftClaimId == "" {

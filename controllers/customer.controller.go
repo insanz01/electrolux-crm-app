@@ -28,7 +28,7 @@ func NewCustomerController(service services.CustomerService) CustomerController 
 	}
 }
 
-// GetAllCustomer		godoc
+// GetAllCustomers		godoc
 // @Summary			Get All Customers
 // @Description		Get All Customer from Db.
 // @Produce			application/json
@@ -129,12 +129,12 @@ func (cc *customerController) FindById(c echo.Context) error {
 // UpdateCustomer		godoc
 // @Summary			Update customers
 // @Description		Update customers data.
-// @Param			tagId path string true "update customers by id"
-// @Param			customers body request.CreateTagsRequest true  "Update customers"
+// @Param			customerId path string true "update customers by id"
+// @Param			customers body request.CustomerUpdateRequest true  "Update customers"
 // @Tags			customers
 // @Produce			application/json
 // @Success			200 {object} response.Response{}
-// @Router			/customers/{tagId} [patch]
+// @Router			/customers/{customerId} [put]
 func (cc *customerController) Update(c echo.Context) error {
 	customerRequest := dto.CustomerUpdateRequest{}
 
@@ -174,7 +174,7 @@ func (cc *customerController) Update(c echo.Context) error {
 // @Produce			application/json
 // @Tags			customers
 // @Success			200 {object} response.Response{}
-// @Router			/customers/{tagID} [delete]
+// @Router			/customers/{customerId} [delete]
 func (cc *customerController) Delete(c echo.Context) error {
 	customerId := c.Param("id")
 	if customerId == "" {
