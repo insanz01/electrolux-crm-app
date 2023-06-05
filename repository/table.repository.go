@@ -12,12 +12,14 @@ type TableRepository interface {
 	FindIdTableCategoryByName(name string) (*models.TableCategory, error)
 	InsertTableData(tableData models.TableData) (string, error)
 	InsertTableProperty(property models.TableProperty) (string, error)
+	UpdatedDate(tableId string) (string, error)
 }
 
 const (
 	getTableListCategoryQuery = "SELECT id, name FROM public.table_list WHERE name = $1"
 	insertTableDataQuery      = "INSERT INTO public.table_data (table_id) VALUES (:table_id) returning id"
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
+	getUpdatedDateQuery       = "SELECT public.table_data.updated_at FROM public.table_data WHERE public.table_data.id = $1"
 )
 
 func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCategory, error) {
@@ -71,4 +73,17 @@ func (r *Repository) InsertTableProperty(property models.TableProperty) (string,
 		return "", errors.New("insert_table_property" + err.Error())
 	}
 	return uuid, nil
+}
+
+func (r *Repository) UpdatedDate(tableId string) (string, error) {
+	var theDated struct {
+		UpdatedAt string `db:"updated_at"`
+	}
+
+	err := r.db.Select(&theDated, getUpdatedDateQuery, tableId)
+	if err != nil {
+		return "", err
+	}
+
+	return theDated.UpdatedAt, nil
 }

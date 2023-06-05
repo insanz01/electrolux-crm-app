@@ -10,6 +10,7 @@ type GiftClaim struct {
 	Datatype    string  `json:"datatype"`
 	IsMandatory bool    `json:"is_mandatory"`
 	InputType   string  `json:"input_type"`
+	UpdatedAt   string  `json:"updated_at"`
 }
 
 type GroupGiftClaim struct {

@@ -24,6 +24,7 @@ type GiftProperties struct {
 	Datatype    string  `db:"datatype" json:"datatype"`
 	IsMandatory bool    `db:"is_mandatory" json:"is_mandatory"`
 	InputType   string  `db:"input_type" json:"input_type"`
+	UpdatedAt   string  `db:"updated_at" json:"updated_at"`
 }
 
 type Gifts struct {
