@@ -34,6 +34,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	file, err := c.FormFile("file")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
@@ -43,6 +44,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	err = c.Bind(&fileUpload)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
@@ -55,6 +57,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		fmt.Println("gagal 1")
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
@@ -73,6 +76,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		fmt.Println("gagal 2")
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
@@ -83,6 +87,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if _, err = io.Copy(dst, src); err != nil {
 		fmt.Println("gagal 3")
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
@@ -92,12 +97,14 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		fmt.Println("gagal 4")
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": err.Error,
 			"data":    nil,
 		})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
+		"status":  1,
 		"message": "File uploaded successfully",
 		"data":    fileResponse,
 	})
@@ -109,6 +116,7 @@ func (fc *fileController) GetFile(c echo.Context) error {
 
 	if uuid == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{
+			"status":  0,
 			"message": "invalid parameter request",
 			"data":    nil,
 		})
