@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -40,8 +41,21 @@ func (gc *giftController) FindAll(c echo.Context) error {
 	giftClaimProperties := dto.GiftClaimProperties{}
 
 	c.Bind(&giftClaimProperties)
+	limitParam := c.QueryParam("limit")
+	limit, _ := strconv.Atoi(limitParam)
 
-	if giftClaimProperties.Properties == nil {
+	pageParam := c.QueryParam("page")
+	page, _ := strconv.Atoi(pageParam)
+
+	if limit == 0 {
+		limit = 5
+	}
+
+	if page == 0 {
+		page = 1
+	}
+
+	if giftClaimProperties.Properties == nil && giftClaimProperties.Filters == nil {
 		giftClaims, err := gc.giftService.FindAll(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, echo.Map{

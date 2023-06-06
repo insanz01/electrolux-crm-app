@@ -13,6 +13,7 @@ type FileRepository interface {
 const (
 	insertFileQuery = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
 	getFileQuery    = "SELECT id, filename, category, num_of_failed, num_of_success, status FROM public.excel_document WHERE id = $1"
+	getAllFileQuery = "SELECT id, filename, category, num_of_failed, num_of_success, status FROM public.excel_document"
 )
 
 func (r *Repository) UploadFile(insertFile models.FileExcelDocument) (string, error) {
@@ -28,6 +29,17 @@ func (r *Repository) UploadFile(insertFile models.FileExcelDocument) (string, er
 		return "", errors.New("insert_excel_document" + err.Error())
 	}
 	return uuid, nil
+}
+
+func (r *Repository) GetAllFile() ([]*models.FileExcelDocument, error) {
+	var files []*models.FileExcelDocument
+
+	err := r.db.Select(&files, getAllFileQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 func (r *Repository) GetFile(id string) (*models.FileExcelDocument, error) {

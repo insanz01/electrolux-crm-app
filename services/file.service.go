@@ -10,6 +10,7 @@ import (
 )
 
 type FileService interface {
+	GetAllDocument(c echo.Context) ([]*dto.FileResponse, error)
 	GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error)
 	Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.FileResponse, error)
 }
@@ -24,9 +25,26 @@ func NewFileService(repository *repository.Repository) FileService {
 	}
 }
 
-func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error) {
-	fmt.Println(uuid)
+func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, error) {
+	files, err := fs.repository.GetAllFile()
+	if err != nil {
+		return nil, err
+	}
 
+	fileResponse := []*dto.FileResponse{}
+	for _, file := range files {
+		fileResponse = append(fileResponse, &dto.FileResponse{
+			UUID:     file.Id,
+			Filename: file.Filename,
+			Status:   file.Status,
+			Category: file.Category,
+		})
+	}
+
+	return fileResponse, nil
+}
+
+func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error) {
 	file, err := fs.repository.GetFile(uuid)
 	if err != nil {
 		return nil, err
@@ -36,6 +54,7 @@ func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileRespon
 		UUID:     file.Id,
 		Filename: file.Filename,
 		Status:   file.Status,
+		Category: file.Category,
 	}
 
 	fmt.Println(fileResponse)

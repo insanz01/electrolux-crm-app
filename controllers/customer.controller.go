@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -39,8 +40,28 @@ func (cc *customerController) FindAll(c echo.Context) error {
 	customerProperties := dto.CustomerProperties{}
 
 	c.Bind(&customerProperties)
+	limitParam := c.QueryParam("limit")
+	limit, _ := strconv.Atoi(limitParam)
 
-	if customerProperties.Properties == nil {
+	pageParam := c.QueryParam("page")
+	page, _ := strconv.Atoi(pageParam)
+
+	if limit == 0 {
+		limit = 5
+	}
+
+	if page == 0 {
+		page = 1
+	}
+
+	pagination := models.Pagination{
+		Page:  page,
+		Limit: limit,
+	}
+
+	c.Set("pagination", pagination)
+
+	if customerProperties.Properties == nil && customerProperties.Filters == nil {
 		customers, err := cc.customerService.FindAll(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, echo.Map{

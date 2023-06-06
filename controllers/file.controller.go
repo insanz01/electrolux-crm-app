@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 	"github.com/labstack/echo/v4"
@@ -13,6 +14,7 @@ import (
 
 type FileController interface {
 	Upload(c echo.Context) error
+	GetAllFile(c echo.Context) error
 	GetFile(c echo.Context) error
 }
 
@@ -34,7 +36,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -44,7 +46,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -56,7 +58,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -74,7 +76,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -84,7 +86,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if _, err = io.Copy(dst, src); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -93,7 +95,7 @@ func (fc *fileController) Upload(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
-			"message": err.Error,
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}
@@ -103,6 +105,27 @@ func (fc *fileController) Upload(c echo.Context) error {
 		"message": "File uploaded successfully",
 		"data":    fileResponse,
 	})
+}
+
+func (fc *fileController) GetAllFile(c echo.Context) error {
+	files, err := fc.fileService.GetAllDocument(c)
+	if err != nil {
+		webResponse := models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		}
+
+		return c.JSON(http.StatusBadRequest, webResponse)
+	}
+
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    files,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
 }
 
 func (fc *fileController) GetFile(c echo.Context) error {

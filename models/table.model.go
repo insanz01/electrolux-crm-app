@@ -24,3 +24,8 @@ type TableCategory struct {
 type TableData struct {
 	TableId string `db:"table_id"`
 }
+
+type Pagination struct {
+	Page  int
+	Limit int
+}

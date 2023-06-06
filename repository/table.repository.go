@@ -24,7 +24,19 @@ const (
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
 	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
 	getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
+	countTableIdQuery         = "SELECT public.properties.id FROM public.properties WHERE public.properties.table_data_id = $1"
 )
+
+func (r *Repository) CountTableId(tableId string) (int, error) {
+	var data []*string
+
+	err := r.db.Select(&data, countTableIdQuery, tableId)
+	if err != nil {
+		return 0, err
+	}
+
+	return len(data), nil
+}
 
 func (r *Repository) GetTableIdByValue(filter []dto.CustomerFilter) ([]*string, error) {
 	var tableIds []*string
@@ -47,6 +59,8 @@ func (r *Repository) GetTableIdByValue(filter []dto.CustomerFilter) ([]*string, 
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(tableIds)
 
 	return tableIds, err
 }

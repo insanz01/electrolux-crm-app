@@ -31,7 +31,9 @@ func NewCustomerService(repository *repository.Repository) CustomerService {
 
 func (cs *customerService) FindAll(c echo.Context) (*dto.CustomerResponse, error) {
 
-	customers, err := cs.repository.GetAll()
+	pagination := c.Get("pagination").(models.Pagination)
+
+	customers, err := cs.repository.GetAll(pagination)
 	if err != nil {
 		return nil, err
 	}
