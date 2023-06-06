@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -64,6 +65,7 @@ func (cc *customerController) FindAll(c echo.Context) error {
 	if customerProperties.Properties == nil && customerProperties.Filters == nil {
 		customers, err := cc.customerService.FindAll(c)
 		if err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusBadRequest, echo.Map{
 				"status":  0,
 				"message": "error",
