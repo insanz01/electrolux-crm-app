@@ -60,11 +60,21 @@ func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileRespon
 		return nil, err
 	}
 
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
+
 	fileResponse := dto.FileResponse{
-		UUID:     file.Id,
-		Filename: file.Filename,
-		Status:   file.Status,
-		Category: file.Category,
+		UUID:      file.Id,
+		Filename:  file.Filename,
+		Status:    file.Status,
+		Category:  file.Category,
+		FilePath:  url + file.Filename,
+		UpdatedAt: file.UpdatedAt,
 	}
 
 	fmt.Println(fileResponse)
