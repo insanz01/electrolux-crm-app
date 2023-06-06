@@ -151,7 +151,7 @@ func (fs *fileService) GetInvalidDocument(c echo.Context, uuid string) (*dto.Inv
 		urlSchema = "http"
 	}
 
-	url := fmt.Sprintf("%s://%s/export/invalid/", urlSchema, "localhost:4321")
+	url := fmt.Sprintf("%s://%s/invalid_uploads/", urlSchema, "localhost:4321")
 
 	fileResponse := dto.InvalidFileResponse{
 		Id:              file.Id,
