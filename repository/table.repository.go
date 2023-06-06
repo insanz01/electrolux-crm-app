@@ -20,7 +20,7 @@ const (
 	getUpdatedDateQuery       = "SELECT public.table_data.updated_at FROM public.table_data WHERE public.table_data.id = $1"
 	insertTableDataQuery      = "INSERT INTO public.table_data (table_id) VALUES (:table_id) returning id"
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
-	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE table_data_id = :table_data_id"
+	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
 )
 
 func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCategory, error) {
