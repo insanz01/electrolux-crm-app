@@ -11,9 +11,11 @@ type FileRepository interface {
 }
 
 const (
-	insertFileQuery = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
-	getFileQuery    = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
-	getAllFileQuery = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document"
+	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
+	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
+	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document"
+	getInvalidFileQuery    = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid WHERE id = $1"
+	getAllInvalidFileQuery = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid"
 )
 
 func (r *Repository) UploadFile(insertFile models.FileExcelDocument) (string, error) {
@@ -50,7 +52,33 @@ func (r *Repository) GetFile(id string) (*models.FileExcelDocument, error) {
 		return nil, err
 	}
 
-	if len(files) < 1 {
+	if len(files) == 0 {
+		return nil, nil
+	}
+
+	return files[0], nil
+}
+
+func (r *Repository) GetAllInvalidFile() ([]*models.InvalidFileExcelDocument, error) {
+	var files []*models.InvalidFileExcelDocument
+
+	err := r.db.Select(&files, getAllInvalidFileQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func (r *Repository) GetInvalidFile(id string) (*models.InvalidFileExcelDocument, error) {
+	var files []*models.InvalidFileExcelDocument
+
+	err := r.db.Select(&files, getInvalidFileQuery, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(files) == 0 {
 		return nil, nil
 	}
 

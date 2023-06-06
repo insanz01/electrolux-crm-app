@@ -11,3 +11,13 @@ type FileExcelDocument struct {
 	UpdatedAt    string  `db:"updated_at"`
 	DeletedAt    *string `db:"deleted_at"`
 }
+
+type InvalidFileExcelDocument struct {
+	Id              string  `db:"id"`
+	ExcelDocumentId string  `db:"excel_document_id"`
+	Filename        string  `db:"filename"`
+	IsValid         bool    `db:"is_valid"`
+	CreatedAt       string  `db:"created_at"`
+	UpdatedAt       string  `db:"updated_at"`
+	DeletedAt       *string `db:"deleted_at"`
+}

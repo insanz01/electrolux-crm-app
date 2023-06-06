@@ -13,6 +13,8 @@ type FileService interface {
 	GetAllDocument(c echo.Context) ([]*dto.FileResponse, error)
 	GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error)
 	Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.FileResponse, error)
+	GetAllInvalidDocument(c echo.Context) ([]*dto.InvalidFileResponse, error)
+	GetInvalidDocument(c echo.Context, uuid string) (*dto.InvalidFileResponse, error)
 }
 
 type fileService struct {
@@ -106,4 +108,59 @@ func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.
 	}
 
 	return &response, nil
+}
+
+func (fs *fileService) GetAllInvalidDocument(c echo.Context) ([]*dto.InvalidFileResponse, error) {
+	files, err := fs.repository.GetAllInvalidFile()
+	if err != nil {
+		return nil, err
+	}
+
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
+
+	fileResponse := []*dto.InvalidFileResponse{}
+	for _, file := range files {
+		fileResponse = append(fileResponse, &dto.InvalidFileResponse{
+			Id:              file.Id,
+			ExcelDocumentId: file.ExcelDocumentId,
+			Filename:        file.Filename,
+			IsValid:         file.IsValid,
+			FilePath:        url + file.Filename,
+			UpdatedAt:       file.UpdatedAt,
+		})
+	}
+
+	return fileResponse, nil
+}
+
+func (fs *fileService) GetInvalidDocument(c echo.Context, uuid string) (*dto.InvalidFileResponse, error) {
+	file, err := fs.repository.GetInvalidFile(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/export/invalid/", urlSchema, "localhost:4321")
+
+	fileResponse := dto.InvalidFileResponse{
+		Id:              file.Id,
+		ExcelDocumentId: file.ExcelDocumentId,
+		Filename:        file.Filename,
+		IsValid:         file.IsValid,
+		FilePath:        url + file.Filename,
+		UpdatedAt:       file.UpdatedAt,
+	}
+
+	return &fileResponse, nil
 }

@@ -17,6 +17,7 @@ import (
 type FileController interface {
 	Upload(c echo.Context) error
 	GetAllFile(c echo.Context) error
+	GetAllInvalidFile(c echo.Context) error
 	GetFile(c echo.Context) error
 	Download(c echo.Context) error
 }
@@ -142,6 +143,27 @@ func (fc *fileController) Upload(c echo.Context) error {
 
 func (fc *fileController) GetAllFile(c echo.Context) error {
 	files, err := fc.fileService.GetAllDocument(c)
+	if err != nil {
+		webResponse := models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		}
+
+		return c.JSON(http.StatusBadRequest, webResponse)
+	}
+
+	webResponse := models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    files,
+	}
+
+	return c.JSON(http.StatusOK, webResponse)
+}
+
+func (fc *fileController) GetAllInvalidFile(c echo.Context) error {
+	files, err := fc.fileService.GetAllInvalidDocument(c)
 	if err != nil {
 		webResponse := models.Response{
 			Status:  0,

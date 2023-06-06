@@ -8,3 +8,12 @@ type FileResponse struct {
 	FilePath  string `json:"file_path"`
 	UpdatedAt string `json:"updated_at"`
 }
+
+type InvalidFileResponse struct {
+	Id              string `json:"id"`
+	ExcelDocumentId string `json:"excel_document_id"`
+	Filename        string `json:"filename"`
+	IsValid         bool   `json:"is_valid"`
+	FilePath        string `json:"file_path"`
+	UpdatedAt       string `json:"updated_at"`
+}
