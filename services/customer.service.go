@@ -147,7 +147,6 @@ func (cs *customerService) Update(c echo.Context, customer dto.CustomerUpdateReq
 
 	err = cs.repository.UpdateDate(uuid)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

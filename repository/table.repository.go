@@ -81,6 +81,8 @@ func (r *Repository) UpdateDate(tableId string) error {
 		TableDataId string `db:"table_data_id"`
 	}
 
+	updatedData.TableDataId = tableId
+
 	_, err := r.db.NamedExec(updateDateQuery, updatedData)
 	if err != nil {
 		return err
