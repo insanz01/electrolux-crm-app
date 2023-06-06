@@ -50,7 +50,7 @@ func (gs *giftService) FindByPropsOrFilter(c echo.Context, giftProperties dto.Gi
 		return nil, err
 	}
 
-	groupedGiftClaims := make(map[string][]*models.CustomerProperties)
+	groupedGiftClaims := make(map[string][]*models.GiftProperties)
 	for _, giftClaim := range giftClaims {
 		groupId := giftClaim.TableDataID
 		groupedGiftClaims[groupId] = append(groupedGiftClaims[groupId], giftClaim)

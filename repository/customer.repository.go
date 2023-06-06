@@ -65,12 +65,7 @@ func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*mod
 		useFilter = true
 	}
 
-	fmt.Println(useFilter)
-
 	if useFilter {
-		fmt.Println(finalQuery)
-		fmt.Println(tableIds)
-
 		// Persiapan query
 		query, args, err := sqlx.In(finalQuery, properties.Properties, tableIds)
 		if err != nil {

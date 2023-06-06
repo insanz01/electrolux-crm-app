@@ -38,8 +38,44 @@ func (r *Repository) GetAllGiftClaim() ([]*models.GiftProperties, error) {
 	return giftClaims, nil
 }
 
-func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimProperties) ([]*models.CustomerProperties, error) {
-	var customers []*models.CustomerProperties
+func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimProperties) ([]*models.GiftProperties, error) {
+	var giftClaims []*models.GiftProperties
+
+	finalQuery := getAllGiftWithFilterQuery
+	var tableIds []*string
+
+	useFilter := false
+
+	if properties.Filters != nil {
+		tempTableIds, err := r.GetTableIdByValue(properties.Filters)
+		if err != nil {
+			return nil, err
+		}
+
+		tableIds = tempTableIds
+
+		finalQuery = fmt.Sprintf("%s AND public.properties.table_data_id IN (?)", finalQuery)
+
+		useFilter = true
+	}
+
+	if useFilter {
+		// Persiapan query
+		query, args, err := sqlx.In(finalQuery, properties.Properties, tableIds)
+		if err != nil {
+			return nil, err
+		}
+
+		query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+		// Eksekusi query
+		err = r.db.Select(&giftClaims, query, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		return giftClaims, err
+	}
 
 	// Persiapan query
 	query, args, err := sqlx.In(getAllGiftWithFilterQuery, properties.Properties)
@@ -50,12 +86,12 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 	query = sqlx.Rebind(sqlx.DOLLAR, query)
 
 	// Eksekusi query
-	err = r.db.Select(&customers, query, args...)
+	err = r.db.Select(&giftClaims, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return customers, err
+	return giftClaims, err
 }
 
 func (r *Repository) GetSingleGiftClaim(id string) ([]*models.GiftProperties, error) {
