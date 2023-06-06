@@ -94,6 +94,7 @@ func Init() *echo.Echo {
 	api.GET("/files", fileController.GetAllFile)
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)
+	api.GET("/files/invalid", fileController.GetAllInvalidFile)
 
 	api.GET("/test-struct-validation", controllers.TestStructValidation)
 	api.GET("/test-variable-validation", controllers.TestVariableValidation)
