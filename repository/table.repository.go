@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
+	"github.com/jmoiron/sqlx"
 )
 
 type TableRepository interface {
@@ -21,7 +23,33 @@ const (
 	insertTableDataQuery      = "INSERT INTO public.table_data (table_id) VALUES (:table_id) returning id"
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
 	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
+	getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
 )
+
+func (r *Repository) GetTableIdByValue(filter []dto.CustomerFilter) ([]*string, error) {
+	var tableIds []*string
+	var filters []string
+
+	for _, f := range filter {
+		filters = append(filters, f.Value)
+	}
+
+	// Persiapan query
+	query, args, err := sqlx.In(getTableIdsQuery, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+	// Eksekusi query
+	err = r.db.Select(&tableIds, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return tableIds, err
+}
 
 func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCategory, error) {
 	tableList := []models.TableCategory{}

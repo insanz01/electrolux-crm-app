@@ -40,26 +40,39 @@ func (r *Repository) GetAll() ([]*models.CustomerProperties, error) {
 
 func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
 	var customers []*models.CustomerProperties
-	var filterValueQuery []string
+	// var filterValueQuery []string
 
 	finalQuery := getAllWithFilterQuery
+	var tableIds []*string
 
 	useFilter := false
 
 	if properties.Filters != nil {
-		for _, filter := range properties.Filters {
-			properties.Properties = append(properties.Properties, filter.Property)
-			filterValueQuery = append(filterValueQuery, filter.Value)
+		tempTableIds, err := r.GetTableIdByValue(properties.Filters)
+		if err != nil {
+			return nil, err
 		}
 
-		finalQuery = fmt.Sprintf("%s AND public.properties.value IN (?)", finalQuery)
+		tableIds = tempTableIds
+
+		// for _, filter := range properties.Filters {
+		// 	properties.Properties = append(properties.Properties, filter.Property)
+		// 	filterValueQuery = append(filterValueQuery, filter.Value)
+		// }
+
+		finalQuery = fmt.Sprintf("%s AND public.properties.table_data_id IN (?)", finalQuery)
 
 		useFilter = true
 	}
 
+	fmt.Println(useFilter)
+
 	if useFilter {
+		fmt.Println(finalQuery)
+		fmt.Println(tableIds)
+
 		// Persiapan query
-		query, args, err := sqlx.In(finalQuery, properties.Properties, filterValueQuery)
+		query, args, err := sqlx.In(finalQuery, properties.Properties, tableIds)
 		if err != nil {
 			return nil, err
 		}
