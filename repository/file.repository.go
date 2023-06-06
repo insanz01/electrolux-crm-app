@@ -12,8 +12,8 @@ type FileRepository interface {
 
 const (
 	insertFileQuery = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
-	getFileQuery    = "SELECT id, filename, category, num_of_failed, num_of_success, status FROM public.excel_document WHERE id = $1"
-	getAllFileQuery = "SELECT id, filename, category, num_of_failed, num_of_success, status FROM public.excel_document"
+	getFileQuery    = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
+	getAllFileQuery = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document"
 )
 
 func (r *Repository) UploadFile(insertFile models.FileExcelDocument) (string, error) {

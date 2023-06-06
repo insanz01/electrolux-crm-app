@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
+
 	// "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/middleware"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/controllers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/db"
@@ -47,6 +49,23 @@ func Init() *echo.Echo {
 	campaignController := controllers.NewCampaignController(campaignService)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	e.GET("/hostname", func(c echo.Context) error {
+		req := c.Request()
+		urlSchema := req.URL.Scheme
+		if urlSchema == "" {
+			urlSchema = "http"
+		}
+
+		url := fmt.Sprintf("%s://%s%s", urlSchema, req.Host, req.URL.Path)
+		if req.URL.RawQuery != "" {
+			url += "?" + req.URL.RawQuery
+		}
+
+		return c.String(http.StatusOK, "URL: "+url)
+	})
+
+	e.GET("/assets/:filename", fileController.Download)
 
 	api := e.Group("api/v1")
 

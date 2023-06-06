@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -16,6 +18,7 @@ type FileController interface {
 	Upload(c echo.Context) error
 	GetAllFile(c echo.Context) error
 	GetFile(c echo.Context) error
+	Download(c echo.Context) error
 }
 
 type (
@@ -28,6 +31,36 @@ func NewFileController(service services.FileService) FileController {
 	return &fileController{
 		fileService: service,
 	}
+}
+
+func (fc *fileController) Download(c echo.Context) error {
+	fileName := c.Param("filename")
+	filePath := fmt.Sprintf("uploads/%s", fileName)
+
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get file info")
+	}
+
+	// Membuka file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to open file")
+	}
+	defer file.Close()
+
+	// Menentukan header HTTP untuk respons
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+fileName)
+	c.Response().Header().Set("Content-Type", "application/octet-stream")
+	c.Response().Header().Set("Content-Length", strconv.FormatInt(fileInfo.Size(), 10))
+
+	// Mengirim file sebagai respons
+	_, err = io.Copy(c.Response().Writer, file)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to send file")
+	}
+
+	return nil
 }
 
 func (fc *fileController) Upload(c echo.Context) error {

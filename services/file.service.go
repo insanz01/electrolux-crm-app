@@ -31,13 +31,23 @@ func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, erro
 		return nil, err
 	}
 
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
+
 	fileResponse := []*dto.FileResponse{}
 	for _, file := range files {
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:     file.Id,
-			Filename: file.Filename,
-			Status:   file.Status,
-			Category: file.Category,
+			UUID:      file.Id,
+			Filename:  file.Filename,
+			Status:    file.Status,
+			Category:  file.Category,
+			FilePath:  url + file.Filename,
+			UpdatedAt: file.UpdatedAt,
 		})
 	}
 
