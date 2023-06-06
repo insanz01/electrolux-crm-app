@@ -22,7 +22,7 @@ const (
 	getSingleGiftQuery           = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = $1 AND public.table_data.deleted_at is null"
 	getSingleGiftWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null AND public.properties.key in (?)"
 	updateGiftQuery              = "UPDATE public.properties SET properties.value = :value, properties.updated_at = now() WHERE properties.key = :key AND properties.table_data_id = :table_data_id"
-	deleteGiftQuery              = "UPDATE public.properties SET deleted_at = NOW() WHERE properties.id = :id"
+	deleteGiftQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE properties.id = :id"
 
 // insertQuery = "INSERT INTO customer () VALUES ()"
 )
