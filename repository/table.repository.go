@@ -53,8 +53,8 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 			logicalOperator = " AND ("
 		}
 
-		keyProperty := fmt.Sprintf("public.properties.key = '%s'", f.Property)
-		valueProperty := fmt.Sprintf(" AND public.properties.value LIKE '%%%s%%'", f.Value)
+		keyProperty := fmt.Sprintf("LOWER(public.properties.key) = LOWER('%s')", f.Property)
+		valueProperty := fmt.Sprintf(" AND LOWER(public.properties.value) LIKE LOWER('%%%s%%')", f.Value)
 
 		additionalQuery = fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty)
 	}
