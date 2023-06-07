@@ -38,7 +38,7 @@ func (r *Repository) CountTableId(tableId string) (int, error) {
 	return len(data), nil
 }
 
-func (r *Repository) GetTableIdByValue(filter []dto.CustomerFilter) ([]*string, error) {
+func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string, error) {
 	var tableIds []*string
 	var filters []string
 

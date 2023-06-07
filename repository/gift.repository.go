@@ -18,9 +18,9 @@ type GiftRepository interface {
 const (
 	getAllTableIdGiftQuery       = "SELECT public.table_data.id, public.table_data.table_id FROM public.table_data JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.table_data.deleted_at is null"
 	getAllGiftQuery              = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.table_data.deleted_at is null"
-	getAllGiftWithFilterQuery    = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.table_data.deleted_at is null AND public.properties.key IN (?)"
+	getAllGiftWithFilterQuery    = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.table_data.deleted_at is null"
 	getSingleGiftQuery           = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = $1 AND public.table_data.deleted_at is null"
-	getSingleGiftWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null AND public.properties.key in (?)"
+	getSingleGiftWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null"
 	updateGiftQuery              = "UPDATE public.properties SET properties.value = :value, properties.updated_at = now() WHERE properties.key = :key AND properties.table_data_id = :table_data_id"
 	deleteGiftQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE properties.id = :id"
 
@@ -45,6 +45,13 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 	var tableIds []*string
 
 	useFilter := false
+	useProperties := false
+
+	if properties.Properties != nil {
+		useProperties = true
+
+		finalQuery = fmt.Sprintf("%s AND public.properties.key in (?)", finalQuery)
+	}
 
 	if properties.Filters != nil {
 		tempTableIds, err := r.GetTableIdByValue(properties.Filters)
@@ -59,9 +66,25 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 		useFilter = true
 	}
 
-	if useFilter {
+	if useFilter && useProperties {
 		// Persiapan query
 		query, args, err := sqlx.In(finalQuery, properties.Properties, tableIds)
+		if err != nil {
+			return nil, err
+		}
+
+		query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+		// Eksekusi query
+		err = r.db.Select(&giftClaims, query, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		return giftClaims, err
+	} else if useFilter {
+		// Persiapan query
+		query, args, err := sqlx.In(finalQuery, tableIds)
 		if err != nil {
 			return nil, err
 		}

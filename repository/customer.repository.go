@@ -18,9 +18,9 @@ type CustomerRepository interface {
 const (
 	getAllTableId                    = "SELECT public.table_data.id, public.table_data.table_id FROM public.table_data JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null"
 	getAllQuery                      = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null"
-	getAllWithFilterQuery            = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_list.id = public.table_data.table_id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null AND public.properties.key IN (?)"
+	getAllWithFilterQuery            = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_list.id = public.table_data.table_id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null"
 	getSingleQuery                   = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.properties.table_data_id = $1 AND public.table_data.deleted_at is null"
-	getSingleCustomerWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null AND public.properties.key in (?)"
+	getSingleCustomerWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null"
 	updateCustomerQuery              = "UPDATE public.properties SET value = :value, updated_at = NOW() WHERE key = :key AND table_data_id = :table_data_id"
 	deleteCustomerQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE id = :id"
 
@@ -39,6 +39,9 @@ func (r *Repository) GetAll(pagination models.Pagination) ([]*models.CustomerPro
 }
 
 func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
+	fmt.Println("cek kakak")
+	fmt.Println(properties)
+
 	var customers []*models.CustomerProperties
 	// var filterValueQuery []string
 
@@ -46,6 +49,13 @@ func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*mod
 	var tableIds []*string
 
 	useFilter := false
+	useProperties := false
+
+	if properties.Properties != nil {
+		useProperties = true
+
+		finalQuery = fmt.Sprintf("%s AND public.properties.key in (?)", finalQuery)
+	}
 
 	if properties.Filters != nil {
 		tempTableIds, err := r.GetTableIdByValue(properties.Filters)
@@ -65,9 +75,27 @@ func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*mod
 		useFilter = true
 	}
 
-	if useFilter {
+	if useFilter && useProperties {
+
 		// Persiapan query
 		query, args, err := sqlx.In(finalQuery, properties.Properties, tableIds)
+		if err != nil {
+			return nil, err
+		}
+
+		query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+		// Eksekusi query
+		err = r.db.Select(&customers, query, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		return customers, err
+	} else if useFilter {
+
+		// Persiapan query
+		query, args, err := sqlx.In(finalQuery, tableIds)
 		if err != nil {
 			return nil, err
 		}
