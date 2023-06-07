@@ -41,12 +41,14 @@ func Init() *echo.Echo {
 	fileService := services.NewFileService(repo)
 	giftService := services.NewGiftService(repo)
 	campaignService := services.NewCampaignService(repo)
+	productLineService := services.NewProductLineService(repo)
 
 	loginController := controllers.NewLoginController(repo)
 	customerController := controllers.NewCustomerController(customerService)
 	fileController := controllers.NewFileController(fileService)
 	giftController := controllers.NewGiftController(giftService)
 	campaignController := controllers.NewCampaignController(campaignService)
+	productLineController := controllers.NewProductLineController(productLineService)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
@@ -95,6 +97,9 @@ func Init() *echo.Echo {
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)
 	api.GET("/files/invalid", fileController.GetAllInvalidFile)
+
+	api.GET("/product-lines", productLineController.FindAll)
+	api.POST("/product-lines", productLineController.Insert)
 
 	api.GET("/test-struct-validation", controllers.TestStructValidation)
 	api.GET("/test-variable-validation", controllers.TestVariableValidation)
