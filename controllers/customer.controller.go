@@ -16,6 +16,7 @@ type CustomerController interface {
 	FindById(c echo.Context) error
 	Update(c echo.Context) error
 	Delete(c echo.Context) error
+	List(c echo.Context) error
 }
 
 type (
@@ -246,4 +247,33 @@ func (cc *customerController) Delete(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, webResponse)
+}
+
+func (cc *customerController) List(c echo.Context) error {
+	listProperty := dto.ListProperty{}
+
+	c.Bind(&listProperty)
+
+	if listProperty.Property == nil {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid body request",
+			Data:    nil,
+		})
+	}
+
+	listData, err := cc.customerService.List(c, *listProperty.Property)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    listData,
+	})
 }

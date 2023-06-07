@@ -37,3 +37,12 @@ type GroupCustomer struct {
 type CustomerResponse struct {
 	Customer interface{} `json:"customers"`
 }
+
+type ListData struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type ListResponse struct {
+	ListData []ListData `json:"list"`
+}

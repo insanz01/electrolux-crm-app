@@ -101,6 +101,8 @@ func Init() *echo.Echo {
 	api.GET("/product-lines", productLineController.FindAll)
 	api.POST("/product-lines", productLineController.Insert)
 
+	api.GET("/lists", customerController.List)
+
 	api.GET("/test-struct-validation", controllers.TestStructValidation)
 	api.GET("/test-variable-validation", controllers.TestVariableValidation)
 

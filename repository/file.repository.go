@@ -59,6 +59,11 @@ func (r *Repository) GetFile(id string) (*models.FileExcelDocument, error) {
 	return files[0], nil
 }
 
+// ini PR bentar
+func (r *Repository) GetFileWithFilter() ([]*models.FileExcelDocument, error) {
+	return nil, nil
+}
+
 func (r *Repository) GetAllInvalidFile() ([]*models.InvalidFileExcelDocument, error) {
 	var files []*models.InvalidFileExcelDocument
 

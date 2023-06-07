@@ -27,3 +27,7 @@ type CustomerProperties struct {
 	Properties []*string         `json:"properties"`
 	Filters    []*CustomerFilter `json:"filters"`
 }
+
+type ListProperty struct {
+	Property *string `json:"property"`
+}

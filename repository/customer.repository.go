@@ -13,6 +13,7 @@ type CustomerRepository interface {
 	GetSingle(id string) ([]*models.CustomerProperties, error)
 	UpdateCustomer(customers *[]models.CustomerProperties) error
 	DeleteCustomer(tableId string) error
+	GetList(property string) ([]*models.CustomerProperties, error)
 }
 
 const (
@@ -23,9 +24,25 @@ const (
 	getSingleCustomerWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null"
 	updateCustomerQuery              = "UPDATE public.properties SET value = :value, updated_at = NOW() WHERE key = :key AND table_data_id = :table_data_id"
 	deleteCustomerQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE id = :id"
+	getListCustomerQuery             = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null AND public.properties.key = $1"
 
 // insertQuery = "INSERT INTO customer () VALUES ()"
 )
+
+func (r *Repository) GetList(property string) ([]*models.CustomerProperties, error) {
+	var customers []*models.CustomerProperties
+
+	err := r.db.Select(&customers, getListCustomerQuery, property)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(customers) == 0 {
+		return nil, nil
+	}
+
+	return customers, nil
+}
 
 func (r *Repository) GetAll(pagination models.Pagination) ([]*models.CustomerProperties, error) {
 	var customers []*models.CustomerProperties
@@ -136,7 +153,7 @@ func (r *Repository) GetSingle(id string) ([]*models.CustomerProperties, error) 
 		return nil, err
 	}
 
-	if len(customers) < 1 {
+	if len(customers) == 0 {
 		return nil, nil
 	}
 

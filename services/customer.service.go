@@ -17,6 +17,7 @@ type CustomerService interface {
 	// Insert(c echo.Context, customer models.CustomerInsert) (dto.CustomerResponse, error)
 	Update(c echo.Context, customer dto.CustomerUpdateRequest, uuid string) (*dto.CustomerResponse, error)
 	Delete(c echo.Context, uuid string) error
+	List(c echo.Context, property string) (*dto.ListResponse, error)
 }
 
 type customerService struct {
@@ -175,4 +176,30 @@ func (cs *customerService) Delete(c echo.Context, uuid string) error {
 	}
 
 	return nil
+}
+
+func (cs *customerService) List(c echo.Context, property string) (*dto.ListResponse, error) {
+	lists, err := cs.repository.GetList(property)
+	if err != nil {
+		return nil, err
+	}
+
+	listResponse := []dto.ListData{}
+
+	unique := make(map[dto.ListData]bool)
+	for _, list := range lists {
+		tempList := dto.ListData{
+			Key:   list.Key,
+			Value: list.Value,
+		}
+
+		if !unique[tempList] {
+			unique[tempList] = true
+			listResponse = append(listResponse, tempList)
+		}
+	}
+
+	return &dto.ListResponse{
+		ListData: listResponse,
+	}, nil
 }
