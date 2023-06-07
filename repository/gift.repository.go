@@ -56,6 +56,10 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 	if properties.Filters != nil {
 		tempTableIds, err := r.GetTableIdByValue(properties.Filters)
 		if err != nil {
+			if err.Error() == "many_rows_data" {
+				return nil, nil
+			}
+
 			return nil, err
 		}
 
