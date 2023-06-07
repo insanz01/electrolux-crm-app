@@ -7,7 +7,6 @@ import (
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
-	"github.com/jmoiron/sqlx"
 )
 
 type TableRepository interface {
@@ -23,8 +22,9 @@ const (
 	insertTableDataQuery      = "INSERT INTO public.table_data (table_id) VALUES (:table_id) returning id"
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
 	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
-	getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
-	countTableIdQuery         = "SELECT public.properties.id FROM public.properties WHERE public.properties.table_data_id = $1"
+	// getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
+	getTableIdsQuery  = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.deleted_at is null"
+	countTableIdQuery = "SELECT public.properties.id FROM public.properties WHERE public.properties.table_data_id = $1"
 )
 
 func (r *Repository) CountTableId(tableId string) (int, error) {
@@ -42,25 +42,51 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 	var tableIds []*string
 	var filters []string
 
-	for _, f := range filter {
+	additionalQuery := ""
+
+	for idx, f := range filter {
 		filters = append(filters, f.Value)
+
+		logicalOperator := " OR"
+
+		if idx == 0 {
+			logicalOperator = " AND ("
+		}
+
+		keyProperty := fmt.Sprintf("public.properties.key = '%s'", f.Property)
+		valueProperty := fmt.Sprintf(" AND public.properties.value LIKE '%%%s%%'", f.Value)
+
+		additionalQuery = fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty)
 	}
 
-	// Persiapan query
-	query, args, err := sqlx.In(getTableIdsQuery, filters)
+	additionalQuery = fmt.Sprintf("%s)", additionalQuery)
+
+	fmt.Println("isi dari filters", filters)
+
+	finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, additionalQuery)
+
+	// // Persiapan query
+	// query, args, err := sqlx.In(finalQuery, filters)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// query = sqlx.Rebind(sqlx.DOLLAR, query)
+
+	// fmt.Println(query)
+
+	// // Eksekusi query
+	// err = r.db.Select(&tableIds, query, args...)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	err := r.db.Select(&tableIds, finalQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	query = sqlx.Rebind(sqlx.DOLLAR, query)
-
-	// Eksekusi query
-	err = r.db.Select(&tableIds, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println(tableIds)
+	fmt.Println("isi dari tableIds", tableIds)
 
 	return tableIds, err
 }
