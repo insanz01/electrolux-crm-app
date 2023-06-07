@@ -90,7 +90,7 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 
 	fmt.Println("isi dari query", finalQuery)
 
-	if len(tableIds) > 1 {
+	if len(tableIds) > 1 && len(filter) > 1 {
 		return nil, errors.New("many_rows_data")
 	}
 
@@ -111,7 +111,7 @@ func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCatego
 		return nil, err
 	}
 
-	if len(tableList) < 1 {
+	if len(tableList) == 0 {
 		return nil, errors.New("tidak ada data")
 	}
 

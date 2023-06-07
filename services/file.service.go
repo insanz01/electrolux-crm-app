@@ -11,6 +11,7 @@ import (
 
 type FileService interface {
 	GetAllDocument(c echo.Context) ([]*dto.FileResponse, error)
+	GetAllDocumentWithFilter(c echo.Context, filters dto.FileFilterRequest) ([]*dto.FileResponse, error)
 	GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error)
 	Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.FileResponse, error)
 	GetAllInvalidDocument(c echo.Context) ([]*dto.InvalidFileResponse, error)
@@ -29,6 +30,35 @@ func NewFileService(repository *repository.Repository) FileService {
 
 func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, error) {
 	files, err := fs.repository.GetAllFile()
+	if err != nil {
+		return nil, err
+	}
+
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
+
+	fileResponse := []*dto.FileResponse{}
+	for _, file := range files {
+		fileResponse = append(fileResponse, &dto.FileResponse{
+			UUID:      file.Id,
+			Filename:  file.Filename,
+			Status:    file.Status,
+			Category:  file.Category,
+			FilePath:  url + file.Filename,
+			UpdatedAt: file.UpdatedAt,
+		})
+	}
+
+	return fileResponse, nil
+}
+
+func (fs *fileService) GetAllDocumentWithFilter(c echo.Context, filter dto.FileFilterRequest) ([]*dto.FileResponse, error) {
+	files, err := fs.repository.GetAllFileWithFilter(filter.Filters)
 	if err != nil {
 		return nil, err
 	}

@@ -2,18 +2,25 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 )
 
 type FileRepository interface {
 	UploadFile(filename string) (string, error)
+	GetAllFile() ([]*models.FileExcelDocument, error)
+	GetFile(id string) (*models.FileExcelDocument, error)
+	GetAllFileWithFilter(filters []dto.FileFilter) ([]*models.FileExcelDocument, error)
+	GetAllInvalidFile() ([]*models.InvalidFileExcelDocument, error)
+	GetInvalidFile(id string) (*models.InvalidFileExcelDocument, error)
 }
 
 const (
 	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
 	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
-	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document"
+	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE deleted_at is NULL"
 	getInvalidFileQuery    = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid WHERE id = $1"
 	getAllInvalidFileQuery = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid"
 )
@@ -59,9 +66,31 @@ func (r *Repository) GetFile(id string) (*models.FileExcelDocument, error) {
 	return files[0], nil
 }
 
-// ini PR bentar
-func (r *Repository) GetFileWithFilter() ([]*models.FileExcelDocument, error) {
-	return nil, nil
+// on testing
+func (r *Repository) GetAllFileWithFilter(filters []*dto.FileFilter) ([]*models.FileExcelDocument, error) {
+	var files []*models.FileExcelDocument
+
+	filterQuery := ""
+
+	for _, filter := range filters {
+		switch filter.Key {
+		case "id":
+			filterQuery = fmt.Sprintf("%s AND public.excel_document.id = '%s'", filterQuery, filter.Value)
+		case "status":
+			filterQuery = fmt.Sprintf("%s AND public.excel_document.status = '%s'", filterQuery, filter.Value)
+		case "upload_at":
+			filterQuery = fmt.Sprintf("%s AND public.excel_document.created_at = '%s'", filterQuery, filter.Value)
+		}
+	}
+
+	finalQuery := fmt.Sprintf("%s%s", getAllFileQuery, filterQuery)
+
+	err := r.db.Select(&files, finalQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 func (r *Repository) GetAllInvalidFile() ([]*models.InvalidFileExcelDocument, error) {

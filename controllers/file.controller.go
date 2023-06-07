@@ -142,6 +142,27 @@ func (fc *fileController) Upload(c echo.Context) error {
 }
 
 func (fc *fileController) GetAllFile(c echo.Context) error {
+	fileFilterRequest := dto.FileFilterRequest{}
+
+	c.Bind(&fileFilterRequest)
+
+	if fileFilterRequest.Filters != nil {
+		files, err := fc.fileService.GetAllDocumentWithFilter(c, fileFilterRequest)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, models.Response{
+				Status:  0,
+				Message: err.Error(),
+				Data:    nil,
+			})
+		}
+
+		return c.JSON(http.StatusOK, models.Response{
+			Status:  1,
+			Message: "success",
+			Data:    files,
+		})
+	}
+
 	files, err := fc.fileService.GetAllDocument(c)
 	if err != nil {
 		webResponse := models.Response{
