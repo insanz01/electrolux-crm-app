@@ -90,9 +90,9 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 
 	fmt.Println("isi dari query", finalQuery)
 
-	if len(tableIds) > 1 && len(filter) > 1 {
-		return nil, errors.New("many_rows_data")
-	}
+	// if len(tableIds) > 1 && len(filter) > 1 {
+	// 	return nil, errors.New("many_rows_data")
+	// }
 
 	return tableIds, err
 }
