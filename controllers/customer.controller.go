@@ -69,7 +69,7 @@ func (cc *customerController) FindAll(c echo.Context) error {
 			fmt.Println(err)
 			c.JSON(http.StatusBadRequest, echo.Map{
 				"status":  0,
-				"message": "error",
+				"message": err.Error(),
 				"data":    nil,
 			})
 			return nil
@@ -87,7 +87,7 @@ func (cc *customerController) FindAll(c echo.Context) error {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, echo.Map{
 				"status":  0,
-				"message": "error",
+				"message": err.Error(),
 				"data":    nil,
 			})
 			return nil

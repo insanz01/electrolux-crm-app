@@ -23,7 +23,7 @@ const (
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
 	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
 	// getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
-	getTableIdsQuery  = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.deleted_at is null"
+	getTableIdsQuery  = "SELECT distinct public.properties.table_data_id FROM public.properties WHERE public.properties.deleted_at is null"
 	countTableIdQuery = "SELECT public.properties.id FROM public.properties WHERE public.properties.table_data_id = $1"
 )
 
@@ -53,8 +53,8 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 			logicalOperator = " AND ("
 		}
 
-		keyProperty := fmt.Sprintf("LOWER(public.properties.key) = LOWER('%s')", f.Property)
-		valueProperty := fmt.Sprintf(" AND LOWER(public.properties.value) LIKE LOWER('%%%s%%')", f.Value)
+		keyProperty := fmt.Sprintf(" (LOWER(public.properties.key) = LOWER('%s')", f.Property)
+		valueProperty := fmt.Sprintf(" AND LOWER(public.properties.value) LIKE LOWER('%%%s%%'))", f.Value)
 
 		additionalQuery = fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty)
 	}
@@ -87,6 +87,12 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 	}
 
 	fmt.Println("isi dari tableIds", tableIds)
+
+	fmt.Println("isi dari query", finalQuery)
+
+	if len(tableIds) > 1 {
+		return nil, errors.New("many_rows_data")
+	}
 
 	return tableIds, err
 }
