@@ -23,7 +23,7 @@ type Campaign struct {
 	TemplateId       string     `db:"template_id"`
 }
 
-type CampaignHistory struct {
+type CampaignSummary struct {
 	Id          string `db:"id"`
 	CampaignId  string `db:"campaign_id"`
 	FailedSent  string `db:"failed_sent"`
@@ -38,4 +38,8 @@ type CampaignCustomer struct {
 	SentAt      *time.Time `db:"sent_at"`
 	DeliveredAt *time.Time `db:"delivered_at"`
 	ReadAt      *time.Time `db:"read_at"`
+}
+
+type CampaignFilterProperties struct {
+	Filters []string `db:"filters" json:"filters"`
 }

@@ -1,6 +1,9 @@
 package services
 
 import (
+	"fmt"
+
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
 	"github.com/labstack/echo/v4"
@@ -85,10 +88,72 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 }
 
 func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignInsertRequest) (*dto.CampaignResponse, error) {
-	id, err := r.repository.InsertCampaign(campaignRequest)
+	campaignInsert := models.Campaign{
+		Name:             campaignRequest.Name,
+		ChannelAccountId: campaignRequest.ChannelAccountId,
+		ClientId:         campaignRequest.ClientId,
+		City:             campaignRequest.City,
+		CountRepeat:      campaignRequest.CountRepeat,
+		NumOfOccurence:   campaignRequest.NumOfOccurence,
+		IsRepeated:       campaignRequest.IsRepeated,
+		IsScheduled:      campaignRequest.IsScheduled,
+		ModelType:        campaignRequest.ModelType,
+		ProductLine:      campaignRequest.ProductLine,
+		PurchaseDate:     campaignRequest.PurchaseDate,
+		ScheduleDate:     campaignRequest.ScheduleDate,
+		ServiceType:      campaignRequest.ServiceType,
+		Status:           campaignRequest.Status,
+		TemplateId:       campaignRequest.TemplateId,
+	}
+
+	id, err := r.repository.InsertCampaign(campaignInsert)
 	if err != nil {
 		return nil, err
 	}
+
+	campaignSummary := models.CampaignSummary{
+		CampaignId:  id,
+		FailedSent:  "",
+		SuccessSent: "",
+		Status:      "INITIAL",
+	}
+
+	summaryId, err := r.repository.CreateCampaignSummary(campaignSummary)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("summary id", summaryId)
+
+	campaignFilter := models.CampaignFilterProperties{}
+
+	// add filter list (product line, city/location, service type, model type, purchase date)
+	if len(campaignInsert.ProductLine) > 0 {
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ProductLine...)
+	}
+
+	if len(campaignInsert.City) > 0 {
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.City...)
+	}
+
+	if len(campaignInsert.ServiceType) > 0 {
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ServiceType...)
+	}
+
+	if len(campaignInsert.ModelType) > 0 {
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ModelType...)
+	}
+
+	if campaignInsert.PurchaseDate != nil {
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate.Format("2006-01-02 15:04:05"))
+	}
+
+	campaignCustomerId, err := r.repository.CreateBatchCustomerCampaign(summaryId, campaignFilter)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("customer id", campaignCustomerId)
 
 	campaignResponse := dto.Campaign{
 		Id:               id,

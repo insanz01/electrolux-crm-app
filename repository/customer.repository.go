@@ -56,9 +56,6 @@ func (r *Repository) GetAll(pagination models.Pagination) ([]*models.CustomerPro
 }
 
 func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
-	fmt.Println("cek kakak")
-	fmt.Println(properties)
-
 	var customers []*models.CustomerProperties
 	// var filterValueQuery []string
 
