@@ -100,7 +100,7 @@ func Init() *echo.Echo {
 	api.POST("/campaigns", campaignController.Insert)
 
 	api.GET("/files", fileController.GetAllFile)
-	api.POST("/files", fileController.GetAllFile)
+	api.POST("/files/filter", fileController.GetAllFileFilter)
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)
 	api.GET("/files/invalid", fileController.GetAllInvalidFile)

@@ -79,7 +79,7 @@ func (r *Repository) GetAllFileWithFilter(filters []*dto.FileFilter) ([]*models.
 		case "status":
 			filterQuery = fmt.Sprintf("%s AND public.excel_document.status = '%s'", filterQuery, filter.Value)
 		case "upload_at":
-			filterQuery = fmt.Sprintf("%s AND public.excel_document.created_at = '%s'", filterQuery, filter.Value)
+			filterQuery = fmt.Sprintf("%s AND DATE(public.excel_document.created_at) = DATE('%s')", filterQuery, filter.Value)
 		}
 	}
 

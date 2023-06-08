@@ -110,20 +110,20 @@ func (gc *giftController) FindById(c echo.Context) error {
 	giftClaimId := c.Param("id")
 
 	if giftClaimId == "" {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"status":  0,
-			"message": "invalid parameter request",
-			"data":    nil,
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid parameter request",
+			Data:    nil,
 		})
 	}
 
 	if giftProperties.Properties == nil && giftProperties.Filters == nil {
 		giftClaim, err := gc.giftService.FindById(c, giftClaimId)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"status":  0,
-				"message": "can't get data from db",
-				"data":    nil,
+			return c.JSON(http.StatusInternalServerError, models.Response{
+				Status:  0,
+				Message: "can't get data from db",
+				Data:    nil,
 			})
 		}
 
@@ -138,10 +138,10 @@ func (gc *giftController) FindById(c echo.Context) error {
 
 	giftClaim, err := gc.giftService.FindByIdWithPropsOrFilter(c, giftProperties, giftClaimId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"status":  0,
-			"message": "can't get data from db",
-			"data":    nil,
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: "can't get data from db",
+			Data:    nil,
 		})
 	}
 
@@ -168,28 +168,28 @@ func (gc *giftController) Update(c echo.Context) error {
 
 	giftClaimId := c.Param("id")
 	if giftClaimId == "" {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"status":  0,
-			"message": "invalid request param",
-			"data":    nil,
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid request param",
+			Data:    nil,
 		})
 	}
 
 	err := c.Bind(&giftClaimRequest)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"status":  0,
-			"message": "can't fetch data from request",
-			"data":    nil,
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "can't fetch data from request",
+			Data:    nil,
 		})
 	}
 
 	giftClaimResponse, err := gc.giftService.Update(c, giftClaimRequest, giftClaimId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"status":  0,
-			"message": "can't get data from db",
-			"data":    nil,
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: "can't get data from db",
+			Data:    nil,
 		})
 	}
 
@@ -212,10 +212,10 @@ func (gc *giftController) Update(c echo.Context) error {
 func (gc *giftController) Delete(c echo.Context) error {
 	giftClaimId := c.Param("id")
 	if giftClaimId == "" {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"status":  0,
-			"message": "invalid request param",
-			"data":    nil,
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: "invalid request param",
+			Data:    nil,
 		})
 	}
 
