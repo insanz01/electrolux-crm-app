@@ -25,8 +25,6 @@ const (
 	updateCustomerQuery              = "UPDATE public.properties SET value = :value, updated_at = NOW() WHERE key = :key AND table_data_id = :table_data_id"
 	deleteCustomerQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE id = :id"
 	getListCustomerQuery             = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'customer' AND public.table_data.deleted_at is null AND public.properties.key = $1"
-
-// insertQuery = "INSERT INTO customer () VALUES ()"
 )
 
 func (r *Repository) GetList(property string) ([]*models.CustomerProperties, error) {
@@ -57,7 +55,6 @@ func (r *Repository) GetAll(pagination models.Pagination) ([]*models.CustomerPro
 
 func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*models.CustomerProperties, error) {
 	var customers []*models.CustomerProperties
-	// var filterValueQuery []string
 
 	finalQuery := getAllWithFilterQuery
 	var tableIds []*string
@@ -82,11 +79,6 @@ func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*mod
 		}
 
 		tableIds = tempTableIds
-
-		// for _, filter := range properties.Filters {
-		// 	properties.Properties = append(properties.Properties, filter.Property)
-		// 	filterValueQuery = append(filterValueQuery, filter.Value)
-		// }
 
 		finalQuery = fmt.Sprintf("%s AND public.properties.table_data_id IN (?)", finalQuery)
 

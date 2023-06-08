@@ -22,7 +22,7 @@ const (
 	insertTableDataQuery      = "INSERT INTO public.table_data (table_id) VALUES (:table_id) returning id"
 	insertTableProperty       = "INSERT INTO public.properties (table_data_id, order_number, name, key, value, datatype, is_mandatory, input_type) VALUES (:table_data_id, :order_number, :name, :key, :value, :datatype, :is_mandatory, :input_type) returning id"
 	updateDateQuery           = "UPDATE public.table_data SET updated_at = NOW() WHERE id = :table_data_id"
-	// getTableIdsQuery          = "SELECT public.properties.table_data_id FROM public.properties WHERE public.properties.value IN (?)"
+
 	getTableIdsQuery  = "SELECT distinct public.properties.table_data_id FROM public.properties WHERE public.properties.deleted_at is null"
 	countTableIdQuery = "SELECT public.properties.id FROM public.properties WHERE public.properties.table_data_id = $1"
 )
@@ -40,12 +40,10 @@ func (r *Repository) CountTableId(tableId string) (int, error) {
 
 func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string, error) {
 	var tableIds []*string
-	var filters []string
 
 	additionalQuery := ""
 
 	for idx, f := range filter {
-		filters = append(filters, f.Value)
 
 		logicalOperator := " OR"
 
@@ -61,38 +59,14 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 
 	additionalQuery = fmt.Sprintf("%s)", additionalQuery)
 
-	fmt.Println("isi dari filters", filters)
-
 	finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, additionalQuery)
-
-	// // Persiapan query
-	// query, args, err := sqlx.In(finalQuery, filters)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// query = sqlx.Rebind(sqlx.DOLLAR, query)
-
-	// fmt.Println(query)
-
-	// // Eksekusi query
-	// err = r.db.Select(&tableIds, query, args...)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	err := r.db.Select(&tableIds, finalQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("isi dari tableIds", tableIds)
-
-	fmt.Println("isi dari query", finalQuery)
-
-	// if len(tableIds) > 1 && len(filter) > 1 {
-	// 	return nil, errors.New("many_rows_data")
-	// }
+	// fmt.Println("isi dari query", finalQuery)
 
 	return tableIds, err
 }
@@ -107,7 +81,6 @@ func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCatego
 	}
 
 	if err != nil {
-		fmt.Println("Query error")
 		return nil, err
 	}
 
