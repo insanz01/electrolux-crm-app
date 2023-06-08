@@ -105,7 +105,7 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 	}
 
 	// Persiapan query
-	query, args, err := sqlx.In(getAllGiftWithFilterQuery, properties.Properties)
+	query, args, err := sqlx.In(finalQuery, properties.Properties)
 	if err != nil {
 		return nil, err
 	}

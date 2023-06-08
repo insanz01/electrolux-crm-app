@@ -58,12 +58,11 @@ func (gc *giftController) FindAll(c echo.Context) error {
 	if giftClaimProperties.Properties == nil && giftClaimProperties.Filters == nil {
 		giftClaims, err := gc.giftService.FindAll(c)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, echo.Map{
-				"status":  0,
-				"message": "error",
-				"data":    nil,
+			return c.JSON(http.StatusBadRequest, models.Response{
+				Status:  0,
+				Message: err.Error(),
+				Data:    nil,
 			})
-			return nil
 		}
 
 		webResponse := models.Response{
@@ -77,12 +76,12 @@ func (gc *giftController) FindAll(c echo.Context) error {
 
 	giftClaims, err := gc.giftService.FindByPropsOrFilter(c, giftClaimProperties)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, echo.Map{
-			"status":  0,
-			"message": "error",
-			"data":    nil,
+
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
 		})
-		return nil
 	}
 
 	webResponse := models.Response{

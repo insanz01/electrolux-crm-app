@@ -14,6 +14,7 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // @title Swagger API Electrolux
@@ -50,6 +51,9 @@ func Init() *echo.Echo {
 	campaignController := controllers.NewCampaignController(campaignService)
 	productLineController := controllers.NewProductLineController(productLineService)
 
+	// Middleware CORS
+	e.Use(middleware.CORS())
+
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.GET("/hostname", func(c echo.Context) error {
@@ -80,12 +84,14 @@ func Init() *echo.Echo {
 
 	// api.POST("/customer", customerController.)
 	api.GET("/customers", customerController.FindAll)
-	api.GET("/customers/:id", customerController.FindById)
+	api.POST("/customers", customerController.FindAll)
+	api.POST("/customers/:id", customerController.FindById)
 	api.PUT("/customers/:id", customerController.Update)
 	api.DELETE("/customers/:id", customerController.Delete)
 
 	api.GET("/gift_claims", giftController.FindAll)
-	api.GET("/gift_claims/:id", giftController.FindById)
+	api.POST("/gift_claims", giftController.FindAll)
+	api.POST("/gift_claims/:id", giftController.FindById)
 	api.PUT("/gift_claims/:id", giftController.Update)
 	api.DELETE("/gift_claims/:id", giftController.Delete)
 
@@ -94,6 +100,7 @@ func Init() *echo.Echo {
 	api.POST("/campaigns", campaignController.Insert)
 
 	api.GET("/files", fileController.GetAllFile)
+	api.POST("/files", fileController.GetAllFile)
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)
 	api.GET("/files/invalid", fileController.GetAllInvalidFile)
