@@ -29,5 +29,5 @@ type CustomerProperties struct {
 }
 
 type ListProperty struct {
-	Property *string `json:"property"`
+	Property *string `json:"property" query:"property"`
 }
