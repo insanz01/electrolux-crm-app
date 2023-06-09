@@ -2,25 +2,30 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type Campaign struct {
-	Id               string   `db:"id"`
-	Name             string   `db:"name"`
-	ChannelAccountId string   `db:"channel_account_id"`
-	ClientId         string   `db:"client_id"`
-	City             []string `db:"city"`
-	CountRepeat      *int     `db:"count_repeat"`
-	NumOfOccurence   *int     `db:"num_of_occurence"`
-	IsRepeated       bool     `db:"is_repeated"`
-	IsScheduled      bool     `db:"is_scheduled"`
-	ModelType        []string `db:"model_type"`
-	ProductLine      []string `db:"product_line"`
-	PurchaseDate     string   `db:"purchase_date"`
-	ScheduleDate     string   `db:"schedule_date"`
-	ServiceType      []string `db:"service_type"`
-	Status           string   `db:"status"`
-	TemplateId       string   `db:"template_id"`
+	Id                string         `db:"id"`
+	Name              string         `db:"name"`
+	ChannelAccountId  uuid.UUID      `db:"channel_account_id"`
+	ClientId          uuid.UUID      `db:"client_id"`
+	City              pq.StringArray `db:"city"`
+	CountRepeat       *int           `db:"count_repeat"`
+	NumOfOccurence    *int           `db:"num_of_occurence"`
+	IsRepeated        bool           `db:"is_repeated"`
+	IsScheduled       bool           `db:"is_scheduled"`
+	RepeatType        string         `db:"repeat_type"`
+	ModelType         pq.StringArray `db:"model_type"`
+	ProductLine       pq.StringArray `db:"product_line"`
+	PurchaseStartDate *time.Time     `db:"purchase_start_date"`
+	PurchaseEndDate   *time.Time     `db:"purchase_end_date"`
+	ScheduleDate      *time.Time     `db:"schedule_date"`
+	ServiceType       pq.StringArray `db:"service_type"`
+	Status            string         `db:"status"`
+	TemplateId        uuid.UUID      `db:"template_id"`
 }
 
 type CampaignSummary struct {

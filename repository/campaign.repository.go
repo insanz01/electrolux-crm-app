@@ -17,9 +17,9 @@ type CampaignRepository interface {
 }
 
 const (
-	getAllCampaignQuery         = "SELECT id, name, channel_account_id, client_id, city, count_repeat, is_repeated, is_scheduled, model_type, product_line, purchase_date, schedule_date, service_type, status, template_id FROM public.campaign"
-	getSingleCampaignQuery      = "SELECT id, name, channel_account_id, client_id, city, count_repeat, is_repeated, is_scheduled, model_type, product_line, purchase_date, schedule_date, service_type, status, template_id FROM public.campaign WHERE public.campaign.id = $1"
-	insertCampaignQuery         = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, is_repeated, is_scheduled, model_type, product_line, purchase_date, schedule_date, service_type, status, template_id) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :is_repeated, :is_scheduled, :model_type, :product_line, :purcahse_data, :schedule_date, :service_type, :status, :template_id) returning id"
+	getAllCampaignQuery         = "SELECT id, name, channel_account_id, client_id, city, count_repeat, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign ORDER BY created_at DESC"
+	getSingleCampaignQuery      = "SELECT id, name, channel_account_id, client_id, city, count_repeat, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign WHERE public.campaign.id = $1"
+	insertCampaignQuery         = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :status, :template_id) returning id"
 	insertCampaignSummaryQuery  = "INSERT INTO public.campaign_summary (campaign_id, failed_sent, success_sent, status) VALUES (:campaign_id, :failed_sent, :success_sent, :status) returning id"
 	insertCampaignCustomerQuery = "INSERT INTO public.campaign_customer (summary_id, customer_id, sent_at, delivered_at, read_at) VALUES (:summary_id, :customer_id, :sent_at, :delivered_at, :read_at) returning id"
 
@@ -55,15 +55,16 @@ func (r *Repository) GetSingleCampaign(id string) (*models.Campaign, error) {
 func (r *Repository) InsertCampaign(campaign models.Campaign) (string, error) {
 	stmt, err := r.db.PrepareNamed(insertCampaignQuery)
 	if err != nil {
-		return "", errors.New("insert_excel_document" + err.Error())
+		return "", errors.New("1_insert_campaign " + err.Error())
 	}
 	defer stmt.Close()
 
 	var uuid string
 	err = stmt.QueryRow(&campaign).Scan(&uuid)
 	if err != nil {
-		return "", errors.New("insert_excel_document" + err.Error())
+		return "", errors.New("2_insert_campaign " + err.Error())
 	}
+
 	return uuid, nil
 }
 
@@ -122,8 +123,6 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("query", query)
 
 	uuidString := []string{}
 
