@@ -144,8 +144,9 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignIns
 		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ModelType...)
 	}
 
-	if campaignInsert.PurchaseDate != nil {
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate.Format("2006-01-02 15:04:05"))
+	if campaignInsert.PurchaseDate != "" {
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate.Format("2006-01-02 15:04:05"))
+		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate)
 	}
 
 	campaignCustomerId, err := r.repository.CreateBatchCustomerCampaign(summaryId, campaignFilter)
