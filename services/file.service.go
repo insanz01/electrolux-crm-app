@@ -44,13 +44,22 @@ func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, erro
 
 	fileResponse := []*dto.FileResponse{}
 	for _, file := range files {
+		invalidFile := dto.InvalidFile{}
+
+		if file.InvalidFilename != nil {
+			invalidFile.Filename = file.InvalidFilename
+			invalidFile.IsValid = file.IsValid
+			invalidFile.FilePath = url + *file.InvalidFilename
+		}
+
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:      file.Id,
-			Filename:  file.Filename,
-			Status:    file.Status,
-			Category:  file.Category,
-			FilePath:  url + file.Filename,
-			UpdatedAt: file.UpdatedAt,
+			UUID:        file.Id,
+			Filename:    file.Filename,
+			Status:      file.Status,
+			Category:    file.Category,
+			FilePath:    url + file.Filename,
+			InvalidFile: &invalidFile,
+			UpdatedAt:   file.UpdatedAt,
 		})
 	}
 

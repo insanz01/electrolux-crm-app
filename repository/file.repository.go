@@ -21,6 +21,7 @@ const (
 	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
 	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
 	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE deleted_at is NULL"
+	getAllFileV2Query      = "SELECT ed.id, ed.filename, ed.category, ed.num_of_failed, ed.num_of_success, ed.status, edi.filename as invalid_filename, edi.is_valid, ed.created_at, ed.updated_at, ed.deleted_at FROM public.excel_document ed LEFT JOIN public.excel_document_invalid edi ON ed.id = edi.id WHERE ed.deleted_at is NULL"
 	getInvalidFileQuery    = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid WHERE id = $1"
 	getAllInvalidFileQuery = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid"
 )
@@ -43,7 +44,8 @@ func (r *Repository) UploadFile(insertFile models.FileExcelDocument) (string, er
 func (r *Repository) GetAllFile() ([]*models.FileExcelDocument, error) {
 	var files []*models.FileExcelDocument
 
-	err := r.db.Select(&files, getAllFileQuery)
+	// err := r.db.Select(&files, getAllFileQuery)
+	err := r.db.Select(&files, getAllFileV2Query)
 	if err != nil {
 		return nil, err
 	}
