@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,6 +16,7 @@ type GiftController interface {
 	FindById(c echo.Context) error
 	Update(c echo.Context) error
 	Delete(c echo.Context) error
+	Search(c echo.Context) error
 }
 
 type (
@@ -235,4 +237,43 @@ func (gc *giftController) Delete(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, webResponse)
+}
+
+func (gc *giftController) Search(c echo.Context) error {
+	searchProperties := dto.SearchGift{}
+
+	c.Bind(&searchProperties)
+
+	fmt.Println("ini dia", searchProperties)
+
+	if searchProperties.KeyValue == nil {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid payload request",
+			Data:    nil,
+		})
+	}
+
+	giftClaims, err := gc.giftService.Search(c, searchProperties)
+	if err != nil {
+		if err.Error() == "data property tidak match atau tidak ada" {
+			return c.JSON(http.StatusOK, models.Response{
+				Status:  1,
+				Message: err.Error(),
+				Data:    nil,
+			})
+		}
+
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    giftClaims,
+	})
 }

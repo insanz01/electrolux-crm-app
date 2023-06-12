@@ -29,3 +29,8 @@ type Pagination struct {
 	Page  int
 	Limit int
 }
+
+type KeyValue struct {
+	Key   string `db:"key:"`
+	Value string `db:"value"`
+}

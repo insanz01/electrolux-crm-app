@@ -13,6 +13,8 @@ type GiftRepository interface {
 	GetSingleGiftClaim(id string) ([]*models.GiftProperties, error)
 	UpdateGiftClaim(gifts *[]models.GiftProperties) error
 	DeleteGiftClaim(tableId string) error
+	// refactor nanti
+	SearchGiftClaim(keyValue models.KeyValue) ([]*models.GiftProperties, error)
 }
 
 const (
@@ -23,6 +25,7 @@ const (
 	getSingleGiftWithFilterQuery = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.properties.table_data_id = ? AND public.table_data.deleted_at is null"
 	updateGiftQuery              = "UPDATE public.properties SET properties.value = :value, properties.updated_at = now() WHERE properties.key = :key AND properties.table_data_id = :table_data_id"
 	deleteGiftQuery              = "UPDATE public.table_data SET deleted_at = NOW() WHERE properties.id = :id"
+	searchByKeyValueQuery        = "SELECT public.properties.id, public.properties.table_data_id, public.properties.order_number, public.properties.name, public.properties.key, public.properties.value, public.properties.datatype, public.properties.is_mandatory, public.properties.input_type, public.table_data.updated_at FROM public.properties JOIN public.table_data ON public.properties.table_data_id = public.table_data.id JOIN public.table_list ON public.table_data.table_id = public.table_list.id WHERE public.table_list.name = 'gift_claim' AND public.table_data.deleted_at is null AND public.properties.key = $1 AND public.properties.value = $2"
 
 // insertQuery = "INSERT INTO customer () VALUES ()"
 )
@@ -174,4 +177,15 @@ func (r *Repository) DeleteGiftClaim(tableId string) error {
 		return err
 	}
 	return nil
+}
+
+func (r *Repository) SearchGiftClaim(keyValue models.KeyValue) ([]*models.GiftProperties, error) {
+	var giftClaims []*models.GiftProperties
+
+	err := r.db.Select(&giftClaims, searchByKeyValueQuery, keyValue.Key, keyValue.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return giftClaims, nil
 }

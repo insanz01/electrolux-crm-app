@@ -22,3 +22,17 @@ type GiftClaimProperties struct {
 	Properties []*string         `json:"properties"`
 	Filters    []*CustomerFilter `json:"filters"`
 }
+
+type SearchGiftProperties struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// type SearchGift struct {
+// 	IDClaim     string `json:"id_claim"`
+// 	PhoneNumber string `json:"phone_number"`
+// }
+
+type SearchGift struct {
+	KeyValue []*SearchGiftProperties `json:"properties"`
+}

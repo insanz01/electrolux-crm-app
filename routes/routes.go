@@ -91,6 +91,8 @@ func Init() *echo.Echo {
 
 	api.GET("/gift_claims", giftController.FindAll)
 	api.POST("/gift_claims", giftController.FindAll)
+	api.POST("/gift_claims/search", giftController.Search)
+
 	api.POST("/gift_claims/:id", giftController.FindById)
 	api.PUT("/gift_claims/:id", giftController.Update)
 	api.DELETE("/gift_claims/:id", giftController.Delete)
