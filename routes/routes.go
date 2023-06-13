@@ -101,6 +101,7 @@ func Init() *echo.Echo {
 	api.GET("/campaigns/:id", campaignController.FindById)
 	api.POST("/campaigns", campaignController.Insert)
 	api.GET("/campaigns/:campaign_id/summary", campaignController.Summary)
+	api.GET("/campaigns/:summary_id/customers", campaignController.Customer)
 
 	api.GET("/files", fileController.GetAllFile)
 	api.POST("/files/filter", fileController.GetAllFileFilter)

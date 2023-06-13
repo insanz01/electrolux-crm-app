@@ -15,6 +15,7 @@ type CampaignController interface {
 	FindById(c echo.Context) error
 	Insert(c echo.Context) error
 	Summary(c echo.Context) error
+	Customer(c echo.Context) error
 }
 
 type campaignController struct {
@@ -175,5 +176,32 @@ func (cc *campaignController) Summary(c echo.Context) error {
 		Status:  1,
 		Message: "success",
 		Data:    campaignSummary,
+	})
+}
+
+func (cc *campaignController) Customer(c echo.Context) error {
+	summaryId := c.Param("summary_id")
+
+	if summaryId == "" {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid parameter",
+			Data:    nil,
+		})
+	}
+
+	customerCampaign, err := cc.campaignService.FindCustomerBySummary(c, summaryId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    customerCampaign,
 	})
 }

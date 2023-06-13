@@ -226,6 +226,28 @@ func (cs *campaignService) FindSummary(c echo.Context, id string) (*dto.SummaryC
 }
 
 func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error) {
+	customerCampaigns, err := cs.repository.GetCustomersBySummaryId(summaryId)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	if customerCampaigns == nil {
+		return nil, errors.New("no customer data")
+	}
+
+	customerCampaignResp := []dto.CampaignCustomer{}
+	for _, customer := range customerCampaigns {
+		customerCampaignResp = append(customerCampaignResp, dto.CampaignCustomer{
+			Id:          customer.Id,
+			SummaryId:   customer.SummaryId,
+			CustomerId:  customer.CustomerId,
+			SentAt:      customer.SentAt,
+			DeliveredAt: customer.DeliveredAt,
+			ReadAt:      customer.ReadAt,
+		})
+	}
+
+	return &dto.CampaignCustomerResponses{
+		CampaignCustomers: customerCampaignResp,
+	}, nil
 }
