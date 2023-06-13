@@ -72,6 +72,10 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		return nil, err
 	}
 
+	if campaign == nil {
+		return nil, errors.New("no data by id")
+	}
+
 	singleCampaign := dto.Campaign{
 		Id:                campaign.Id,
 		Name:              campaign.Name,
