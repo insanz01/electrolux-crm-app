@@ -15,6 +15,7 @@ type Campaign struct {
 	CountRepeat       *int      `json:"count_repeat"`
 	IsRepeated        bool      `json:"is_repeated"`
 	IsScheduled       bool      `json:"is_scheduled"`
+	NumOfOccurence    *int      `json:"num_of_occurence"`
 	RepeatType        string    `json:"repeat_type"`
 	ModelType         []string  `json:"model_type"`
 	ProductLine       []string  `json:"product_line"`
