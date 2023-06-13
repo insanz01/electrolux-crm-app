@@ -116,11 +116,12 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 	var customers []*models.CustomerProperties
 
 	finalQuery := getAllUserByCampaignQuery
-	filterDateQuery := "AND DATE(p.value) BETWEEN ? AND ?"
+	// filterDateQuery := "AND DATE(p.value) BETWEEN ? AND ?"
 
-	finalQuery = fmt.Sprintf("%s %s", finalQuery, filterDateQuery)
+	// finalQuery = fmt.Sprintf("%s %s", finalQuery, filterDateQuery)
 	// Persiapan query
-	query, args, err := sqlx.In(finalQuery, filters.Filters, filters.DateRange.StartDate, filters.DateRange.EndDate)
+	// query, args, err := sqlx.In(finalQuery, filters.Filters, filters.DateRange.StartDate, filters.DateRange.EndDate)
+	query, args, err := sqlx.In(finalQuery, filters.Filters)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +129,7 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 	query = sqlx.Rebind(sqlx.DOLLAR, query)
 
 	fmt.Printf("filters: %v\n", filters)
+	fmt.Println("query:", query)
 
 	// Eksekusi query
 	err = r.db.Select(&customers, query, args...)
