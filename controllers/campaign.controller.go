@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -112,13 +113,15 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		})
 	}
 
+	fmt.Println(campaignInsert)
+
 	parsedRequest := dto.CampaignParsedRequest{
 		Name:              campaignInsert.Name,
 		ChannelAccountId:  campaignInsert.ChannelAccountId,
 		ClientId:          campaignInsert.ClientId,
 		City:              campaignInsert.City,
 		CountRepeat:       campaignInsert.CountRepeat,
-		NumOfOccurence:    campaignInsert.NumOfOccurence,
+		NumOfOccurence:    &campaignInsert.NumOfOccurence,
 		IsRepeated:        campaignInsert.IsRepeated,
 		IsScheduled:       campaignInsert.IsScheduled,
 		RepeatType:        campaignInsert.RepeatType,

@@ -12,7 +12,7 @@ type CampaignInsertRequest struct {
 	ClientId          uuid.UUID `json:"client_id"`
 	City              []string  `json:"city"`
 	CountRepeat       *int      `json:"count_repeat"`
-	NumOfOccurence    *int      `json:"num_of_occurence"`
+	NumOfOccurence    int       `json:"num_of_occurence"`
 	IsRepeated        bool      `json:"is_repeated"`
 	IsScheduled       bool      `json:"is_scheduled"`
 	RepeatType        string    `json:"repeat_type"`

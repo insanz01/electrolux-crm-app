@@ -14,7 +14,7 @@ type Campaign struct {
 	ClientId          uuid.UUID      `db:"client_id"`
 	City              pq.StringArray `db:"city"`
 	CountRepeat       *int           `db:"count_repeat"`
-	NumOfOccurence    *int           `db:"num_of_occurence"`
+	NumOfOccurence    int            `db:"num_of_occurence"`
 	IsRepeated        bool           `db:"is_repeated"`
 	IsScheduled       bool           `db:"is_scheduled"`
 	RepeatType        string         `db:"repeat_type"`
