@@ -14,7 +14,7 @@ type CampaignController interface {
 	FindAll(c echo.Context) error
 	FindById(c echo.Context) error
 	Insert(c echo.Context) error
-	Test(c echo.Context) error
+	Summary(c echo.Context) error
 }
 
 type campaignController struct {
@@ -151,14 +151,29 @@ func (cc *campaignController) Insert(c echo.Context) error {
 	return c.JSON(http.StatusOK, webResponse)
 }
 
-func (cc *campaignController) Test(c echo.Context) error {
-	campaign := dto.CampaignInsertV2Request{}
+func (cc *campaignController) Summary(c echo.Context) error {
+	campaignId := c.Param("campaign_id")
 
-	c.Bind(&campaign)
+	if campaignId == "" {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid parameter",
+			Data:    nil,
+		})
+	}
+
+	campaignSummary, err := cc.campaignService.FindSummary(c, campaignId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
 
 	return c.JSON(http.StatusOK, models.Response{
 		Status:  1,
 		Message: "success",
-		Data:    campaign,
+		Data:    campaignSummary,
 	})
 }

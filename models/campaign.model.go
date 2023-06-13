@@ -29,11 +29,13 @@ type Campaign struct {
 }
 
 type CampaignSummary struct {
-	Id          string `db:"id"`
-	CampaignId  string `db:"campaign_id"`
-	FailedSent  string `db:"failed_sent"`
-	SuccessSent string `db:"success_sent"`
-	Status      string `db:"status"`
+	Id          string     `db:"id"`
+	CampaignId  string     `db:"campaign_id"`
+	FailedSent  string     `db:"failed_sent"`
+	SuccessSent string     `db:"success_sent"`
+	Status      string     `db:"status"`
+	CreatedAt   *time.Time `db:"created_at"`
+	UpdatedAt   *time.Time `db:"updated_at"`
 }
 
 type CampaignCustomer struct {
@@ -45,6 +47,12 @@ type CampaignCustomer struct {
 	ReadAt      *time.Time `db:"read_at"`
 }
 
+type CampaignDateRange struct {
+	StartDate *time.Time `db:"purchase_start_date"`
+	EndDate   *time.Time `db:"purchase_end_date"`
+}
+
 type CampaignFilterProperties struct {
-	Filters []string `db:"filters" json:"filters"`
+	Filters   []string          `db:"filters" json:"filters"`
+	DateRange CampaignDateRange `db:"daterange" json:"daterange"`
 }

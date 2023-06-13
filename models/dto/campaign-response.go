@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -30,4 +32,39 @@ type CampaignsResponse struct {
 
 type CampaignResponse struct {
 	Campaign Campaign `json:"campaign"`
+}
+
+type SummaryCampaign struct {
+	Id          string     `json:"id"`
+	CampaignId  string     `json:"campaign_id"`
+	FailedSent  string     `json:"failed_sent"`
+	SuccessSent string     `json:"success_sent"`
+	Status      string     `json:"status"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
+}
+
+type SummaryCampaignResponses struct {
+	SummaryCampaigns []SummaryCampaign `json:"summary_campaigns"`
+}
+
+type SummaryCampaignResponse struct {
+	SummaryCampaign SummaryCampaign `json:"summary_campaign"`
+}
+
+type CampaignCustomer struct {
+	Id          string     `json:"id"`
+	SummaryId   string     `json:"summary_id"`
+	CustomerId  string     `json:"customer_id"`
+	SentAt      *time.Time `json:"sent_at"`
+	DeliveredAt *time.Time `json:"delivered_at"`
+	ReadAt      *time.Time `json:"read_at"`
+}
+
+type CampaignCustomerResponses struct {
+	CampaignCustomers []CampaignCustomer `json:"customer_campaigns"`
+}
+
+type CampaignCustomerResponse struct {
+	CampaignCustomer CampaignCustomer `json:"customer_campaign"`
 }

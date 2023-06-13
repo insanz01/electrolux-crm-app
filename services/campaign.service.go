@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
@@ -12,6 +13,8 @@ import (
 type CampaignService interface {
 	FindAll(c echo.Context) (*dto.CampaignsResponse, error)
 	FindById(c echo.Context, id string) (*dto.CampaignResponse, error)
+	FindSummary(c echo.Context, id string) (*dto.SummaryCampaignResponse, error)
+	FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error)
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
 }
 
@@ -37,9 +40,11 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 		allCampaigns = append(allCampaigns, dto.Campaign{
 			Id:                campaign.Id,
 			Name:              campaign.Name,
+			City:              campaign.City,
 			ChannelAccountId:  campaign.ChannelAccountId,
 			ClientId:          campaign.ClientId,
 			CountRepeat:       campaign.CountRepeat,
+			RepeatType:        campaign.RepeatType,
 			IsRepeated:        campaign.IsRepeated,
 			IsScheduled:       campaign.IsScheduled,
 			ModelType:         campaign.ModelType,
@@ -69,11 +74,13 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	singleCampaign := dto.Campaign{
 		Id:                campaign.Id,
 		Name:              campaign.Name,
+		City:              campaign.City,
 		ChannelAccountId:  campaign.ChannelAccountId,
 		ClientId:          campaign.ClientId,
 		CountRepeat:       campaign.CountRepeat,
 		IsRepeated:        campaign.IsRepeated,
 		IsScheduled:       campaign.IsScheduled,
+		RepeatType:        campaign.RepeatType,
 		ModelType:         campaign.ModelType,
 		ProductLine:       campaign.ProductLine,
 		PurchaseStartDate: campaign.PurchaseStartDate.Format("2006-01-02"),
@@ -99,6 +106,7 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		NumOfOccurence:    campaignRequest.NumOfOccurence,
 		IsRepeated:        campaignRequest.IsRepeated,
 		IsScheduled:       campaignRequest.IsScheduled,
+		RepeatType:        campaignRequest.RepeatType,
 		ModelType:         campaignRequest.ModelType,
 		ProductLine:       campaignRequest.ProductLine,
 		PurchaseStartDate: campaignRequest.PurchaseStartDate,
@@ -149,13 +157,12 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 	}
 
 	if campaignInsert.PurchaseStartDate != nil {
-		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate.Format("2006-01-02 15:04:05"))
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseStartDate.Format("2006-01-02"))
+		campaignFilter.DateRange.StartDate = campaignInsert.PurchaseStartDate
 	}
 
 	if campaignInsert.PurchaseEndDate != nil {
-		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseDate.Format("2006-01-02 15:04:05"))
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseEndDate.Format("2006-01-02"))
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.PurchaseEndDate.Format("2006-01-02"))
+		campaignFilter.DateRange.EndDate = campaignInsert.PurchaseEndDate
 	}
 
 	campaignCustomerId, err := r.repository.CreateBatchCustomerCampaign(summaryId, campaignFilter)
@@ -189,4 +196,34 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 	return &dto.CampaignResponse{
 		Campaign: campaignResponse,
 	}, nil
+}
+
+func (cs *campaignService) FindSummary(c echo.Context, id string) (*dto.SummaryCampaignResponse, error) {
+	summaryCampaign, err := cs.repository.GetSummaryByCampaignId(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if summaryCampaign == nil {
+		return nil, errors.New("no summary data")
+	}
+
+	summaryCampaignResp := dto.SummaryCampaign{
+		Id:          summaryCampaign.Id,
+		CampaignId:  summaryCampaign.CampaignId,
+		FailedSent:  summaryCampaign.FailedSent,
+		SuccessSent: summaryCampaign.SuccessSent,
+		Status:      summaryCampaign.Status,
+		CreatedAt:   summaryCampaign.CreatedAt,
+		UpdatedAt:   summaryCampaign.UpdatedAt,
+	}
+
+	return &dto.SummaryCampaignResponse{
+		SummaryCampaign: summaryCampaignResp,
+	}, nil
+}
+
+func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error) {
+
+	return nil, nil
 }
