@@ -53,13 +53,15 @@ func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, erro
 		}
 
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:        file.Id,
-			Filename:    file.Filename,
-			Status:      file.Status,
-			Category:    file.Category,
-			FilePath:    url + file.Filename,
-			InvalidFile: &invalidFile,
-			UpdatedAt:   file.UpdatedAt,
+			UUID:         file.Id,
+			Filename:     file.Filename,
+			NumOfFailed:  file.NumOfFailed,
+			NumOfSuccess: file.NumOfSuccess,
+			Status:       file.Status,
+			Category:     file.Category,
+			FilePath:     url + file.Filename,
+			InvalidFile:  &invalidFile,
+			UpdatedAt:    file.UpdatedAt,
 		})
 	}
 
@@ -91,13 +93,15 @@ func (fs *fileService) GetAllDocumentWithFilter(c echo.Context, filter dto.FileF
 		}
 
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:        file.Id,
-			Filename:    file.Filename,
-			Status:      file.Status,
-			Category:    file.Category,
-			FilePath:    url + file.Filename,
-			InvalidFile: &invalidFile,
-			UpdatedAt:   file.UpdatedAt,
+			UUID:         file.Id,
+			Filename:     file.Filename,
+			NumOfFailed:  file.NumOfFailed,
+			NumOfSuccess: file.NumOfSuccess,
+			Status:       file.Status,
+			Category:     file.Category,
+			FilePath:     url + file.Filename,
+			InvalidFile:  &invalidFile,
+			UpdatedAt:    file.UpdatedAt,
 		})
 	}
 
@@ -119,12 +123,14 @@ func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileRespon
 	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
 
 	fileResponse := dto.FileResponse{
-		UUID:      file.Id,
-		Filename:  file.Filename,
-		Status:    file.Status,
-		Category:  file.Category,
-		FilePath:  url + file.Filename,
-		UpdatedAt: file.UpdatedAt,
+		UUID:         file.Id,
+		Filename:     file.Filename,
+		NumOfFailed:  file.NumOfFailed,
+		NumOfSuccess: file.NumOfSuccess,
+		Status:       file.Status,
+		Category:     file.Category,
+		FilePath:     url + file.Filename,
+		UpdatedAt:    file.UpdatedAt,
 	}
 
 	fmt.Println(fileResponse)
