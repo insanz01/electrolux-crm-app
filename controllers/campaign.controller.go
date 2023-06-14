@@ -134,7 +134,7 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		PurchaseEndDate:   &purchaseEndDate,
 		ScheduleDate:      &scheduledDate,
 		ServiceType:       campaignInsert.ServiceType,
-		Status:            campaignInsert.Status,
+		Status:            "WAITING APPROVAL",
 		TemplateId:        campaignInsert.TemplateId,
 	}
 
