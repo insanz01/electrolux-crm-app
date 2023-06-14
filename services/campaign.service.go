@@ -18,7 +18,7 @@ type CampaignService interface {
 	FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error)
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
 	State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error)
-	List(c echo.Context, property string) (*dto.ListResponse, error)
+	List(c echo.Context, property string) (*dto.CampaignListResponse, error)
 }
 
 type campaignService struct {
@@ -283,6 +283,7 @@ func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest
 	status := models.CampaignStatus{
 		CampaignId: statusRequest.CampaignId,
 		State:      statusRequest.State,
+		Note:       statusRequest.Note,
 	}
 
 	err := cs.repository.UpdateState(status)
@@ -293,6 +294,7 @@ func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest
 	statusResponse := dto.StatusResponse{
 		CampaignId: status.CampaignId,
 		State:      status.State,
+		Note:       statusRequest.Note,
 	}
 
 	return &statusResponse, nil
@@ -339,7 +341,7 @@ func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dt
 	return &campaignResponse, nil
 }
 
-func (cs *campaignService) List(c echo.Context, property string) (*dto.ListResponse, error) {
+func (cs *campaignService) List(c echo.Context, property string) (*dto.CampaignListResponse, error) {
 	lists, err := cs.repository.GetAllCampaign()
 	if err != nil {
 		return nil, err
@@ -354,11 +356,7 @@ func (cs *campaignService) List(c echo.Context, property string) (*dto.ListRespo
 		}
 	}
 
-	return nil, nil
-
-	// listResponse := []dto.ListData{}
-	// unique := make(map[dto.ListData]bool)
-	// for _, list := range lists {
-	// 	tempList
-	// }
+	return &dto.CampaignListResponse{
+		ListData: listResponse,
+	}, nil
 }

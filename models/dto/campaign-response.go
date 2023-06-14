@@ -83,3 +83,7 @@ type StatusResponse struct {
 	State      string  `json:"status"`
 	Note       *string `json:"note"`
 }
+
+type CampaignListResponse struct {
+	ListData []string `json:"list"`
+}
