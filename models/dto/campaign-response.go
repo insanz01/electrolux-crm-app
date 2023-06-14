@@ -81,7 +81,7 @@ type CampaignCustomerResponse struct {
 type StatusResponse struct {
 	CampaignId string  `json:"campaign_id"`
 	State      string  `json:"status"`
-	Note       *string `json:"note"`
+	Note       *string `json:"note,omitempty"`
 }
 
 type CampaignListResponse struct {
