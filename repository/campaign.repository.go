@@ -232,8 +232,6 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 
 	finalQuery = fmt.Sprintf("%s%s", finalQuery, query)
 
-	fmt.Println(finalQuery)
-
 	err := r.db.Select(&customerCampaigns, finalQuery)
 	if err != nil {
 		return nil, err

@@ -53,13 +53,18 @@ type SummaryCampaignResponse struct {
 	SummaryCampaign SummaryCampaign `json:"summary_campaign"`
 }
 
+type CampaignCustomerDetail struct {
+	PhoneNumber string `json:"phone_number"`
+}
+
 type CampaignCustomer struct {
-	Id          string     `json:"id"`
-	SummaryId   string     `json:"summary_id"`
-	CustomerId  string     `json:"customer_id"`
-	SentAt      *time.Time `json:"sent_at"`
-	DeliveredAt *time.Time `json:"delivered_at"`
-	ReadAt      *time.Time `json:"read_at"`
+	Id             string                 `json:"id"`
+	SummaryId      string                 `json:"summary_id"`
+	CustomerId     string                 `json:"customer_id"`
+	CustomerDetail CampaignCustomerDetail `json:"customer_detail"`
+	SentAt         *time.Time             `json:"sent_at"`
+	DeliveredAt    *time.Time             `json:"delivered_at"`
+	ReadAt         *time.Time             `json:"read_at"`
 }
 
 type CampaignCustomerResponses struct {

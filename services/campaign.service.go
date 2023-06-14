@@ -244,10 +244,23 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 
 	customerCampaignResp := []dto.CampaignCustomer{}
 	for _, customer := range customerCampaigns {
+		customerDetail, _ := cs.repository.GetSingle(customer.CustomerId)
+
+		custMobileNo := ""
+
+		for _, c := range customerDetail {
+			if c.Key == "mobile_no" {
+				custMobileNo = c.Value
+			}
+		}
+
 		customerCampaignResp = append(customerCampaignResp, dto.CampaignCustomer{
-			Id:          customer.Id,
-			SummaryId:   customer.SummaryId,
-			CustomerId:  customer.CustomerId,
+			Id:         customer.Id,
+			SummaryId:  customer.SummaryId,
+			CustomerId: customer.CustomerId,
+			CustomerDetail: dto.CampaignCustomerDetail{
+				PhoneNumber: custMobileNo,
+			},
 			SentAt:      customer.SentAt,
 			DeliveredAt: customer.DeliveredAt,
 			ReadAt:      customer.ReadAt,
