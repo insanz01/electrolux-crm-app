@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,14 +17,16 @@ type CampaignRepository interface {
 	CreateBatchCustomerCampaign(campaignSummaryId string, filters models.CampaignFilterProperties) (string, error)
 	GetSummaryByCampaignId(id string) (*models.Campaign, error)
 	GetCustomersBySummaryId(summaryId string) ([]*models.CampaignCustomer, error)
+	GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]*models.Campaign, error)
 }
 
 const (
-	getAllCampaignQuery         = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign ORDER BY created_at DESC"
-	getSingleCampaignQuery      = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign WHERE public.campaign.id = $1"
-	insertCampaignQuery         = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :status, :template_id) returning id"
-	insertCampaignSummaryQuery  = "INSERT INTO public.campaign_summary (campaign_id, failed_sent, success_sent, status) VALUES (:campaign_id, :failed_sent, :success_sent, :status) returning id"
-	insertCampaignCustomerQuery = "INSERT INTO public.campaign_customer (summary_id, customer_id, sent_at, delivered_at, read_at) VALUES (:summary_id, :customer_id, :sent_at, :delivered_at, :read_at) returning id"
+	getAllCampaignQuery           = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign ORDER BY created_at DESC"
+	getAllCampaignWithFilterQuery = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign WHERE deleted_at is NULL"
+	getSingleCampaignQuery        = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id FROM public.campaign WHERE public.campaign.id = $1"
+	insertCampaignQuery           = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :status, :template_id) returning id"
+	insertCampaignSummaryQuery    = "INSERT INTO public.campaign_summary (campaign_id, failed_sent, success_sent, status) VALUES (:campaign_id, :failed_sent, :success_sent, :status) returning id"
+	insertCampaignCustomerQuery   = "INSERT INTO public.campaign_customer (summary_id, customer_id, sent_at, delivered_at, read_at) VALUES (:summary_id, :customer_id, :sent_at, :delivered_at, :read_at) returning id"
 
 	getAllUserByCampaignQuery = "SELECT DISTINCT p.table_data_id FROM public.properties as p WHERE p.value IN (?)"
 
@@ -180,6 +183,36 @@ func (r *Repository) GetCustomersBySummaryId(summaryId string) ([]*models.Campai
 	var customerCampaigns []*models.CampaignCustomer
 
 	err := r.db.Select(&customerCampaigns, getAllCustomerCampaignBySummaryIdQuery, summaryId)
+	if err != nil {
+		return nil, err
+	}
+
+	return customerCampaigns, nil
+}
+
+func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]*models.Campaign, error) {
+	var customerCampaigns []*models.Campaign
+
+	finalQuery := getAllCampaignWithFilterQuery
+
+	query := ""
+
+	for _, f := range filter.Filters {
+		switch f.Property {
+		case "name":
+			query = fmt.Sprintf("%s AND name = '%s'", query, f.Value)
+		case "channel_account_id":
+			query = fmt.Sprintf("%s AND channel_account_id = '%s'", query, f.Value)
+		case "status":
+			query = fmt.Sprintf("%s AND status = '%s'", query, f.Value)
+		case "submit_at":
+			query = fmt.Sprintf("%s AND date(created_at) = date('%s')", query, f.Value)
+		}
+	}
+
+	finalQuery = fmt.Sprintf("%s%s", finalQuery, query)
+
+	err := r.db.Select(&customerCampaigns, finalQuery)
 	if err != nil {
 		return nil, err
 	}

@@ -13,9 +13,11 @@ import (
 type CampaignService interface {
 	FindAll(c echo.Context) (*dto.CampaignsResponse, error)
 	FindById(c echo.Context, id string) (*dto.CampaignResponse, error)
+	FindAllByFilter(c echo.Context, campaignProperties dto.CampaignProperties) (*dto.CampaignsResponse, error)
 	FindSummary(c echo.Context, id string) (*dto.SummaryCampaignResponse, error)
 	FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error)
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
+	Status(c echo.Context) error
 }
 
 type campaignService struct {
@@ -73,7 +75,7 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	}
 
 	if campaign == nil {
-		return nil, errors.New("no data by id")
+		return nil, errors.New("no data find by id")
 	}
 
 	singleCampaign := dto.Campaign{
@@ -255,4 +257,47 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 	return &dto.CampaignCustomerResponses{
 		CampaignCustomers: customerCampaignResp,
 	}, nil
+}
+
+func (cs *campaignService) Status(c echo.Context) error {
+
+	return nil
+}
+
+func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dto.CampaignProperties) (*dto.CampaignsResponse, error) {
+	campaigns, err := cs.repository.GetAllCampaignWithFilter(campaignProperties)
+	if err != nil {
+		return nil, err
+	}
+
+	var allCampaigns []dto.Campaign
+
+	for _, campaign := range campaigns {
+		allCampaigns = append(allCampaigns, dto.Campaign{
+			Id:                campaign.Id,
+			Name:              campaign.Name,
+			City:              campaign.City,
+			ChannelAccountId:  campaign.ChannelAccountId,
+			ClientId:          campaign.ClientId,
+			CountRepeat:       campaign.CountRepeat,
+			NumOfOccurence:    &campaign.NumOfOccurence,
+			RepeatType:        campaign.RepeatType,
+			IsRepeated:        campaign.IsRepeated,
+			IsScheduled:       campaign.IsScheduled,
+			ModelType:         campaign.ModelType,
+			ProductLine:       campaign.ProductLine,
+			PurchaseStartDate: campaign.PurchaseStartDate.Format("2006-01-02"),
+			PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
+			ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
+			ServiceType:       campaign.ServiceType,
+			Status:            campaign.Status,
+			TemplateId:        campaign.TemplateId,
+		})
+	}
+
+	campaignResponse := dto.CampaignsResponse{
+		Campaigns: allCampaigns,
+	}
+
+	return &campaignResponse, nil
 }

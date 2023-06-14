@@ -63,3 +63,13 @@ type CampaignInsertV2Request struct {
 	Status           string `json:"status"`
 	TemplateId       string `json:"template_id"`
 }
+
+type CampaignFilter struct {
+	Property string `json:"property"`
+	Value    string `json:"value"`
+}
+
+type CampaignProperties struct {
+	Properties []*string         `json:"properties"`
+	Filters    []*CampaignFilter `json:"filters"`
+}
