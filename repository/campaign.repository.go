@@ -135,8 +135,8 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 
 	query = sqlx.Rebind(sqlx.DOLLAR, query)
 
-	fmt.Printf("filters: %v\n", filters)
-	fmt.Println("query:", query)
+	// fmt.Printf("filters: %v\n", filters)
+	// fmt.Println("query:", query)
 
 	// Eksekusi query
 	err = r.db.Select(&customers, query, args...)

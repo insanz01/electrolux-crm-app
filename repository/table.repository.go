@@ -66,8 +66,6 @@ func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string,
 		return nil, err
 	}
 
-	// fmt.Println("isi dari query", finalQuery)
-
 	return tableIds, err
 }
 
@@ -76,7 +74,6 @@ func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCatego
 
 	err := r.db.Select(&tableList, getTableListCategoryQuery, name)
 	if err == sql.ErrNoRows {
-		fmt.Println("No data found")
 		return nil, err
 	}
 
