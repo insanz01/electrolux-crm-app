@@ -206,13 +206,21 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 	for _, f := range filter.Filters {
 		switch f.Property {
 		case "name":
-			query = fmt.Sprintf("%s AND name = '%s'", query, f.Value)
+			if f.Value != "" {
+				query = fmt.Sprintf("%s AND name = '%s'", query, f.Value)
+			}
 		case "channel_account_id":
-			query = fmt.Sprintf("%s AND channel_account_id = '%s'", query, f.Value)
+			if f.Value != "" {
+				query = fmt.Sprintf("%s AND channel_account_id = '%s'", query, f.Value)
+			}
 		case "status":
-			query = fmt.Sprintf("%s AND status = '%s'", query, f.Value)
+			if f.Value != "" {
+				query = fmt.Sprintf("%s AND status = '%s'", query, f.Value)
+			}
 		case "submit_at":
-			query = fmt.Sprintf("%s AND date(created_at) = date('%s')", query, f.Value)
+			if f.Value != "" {
+				query = fmt.Sprintf("%s AND date(created_at) = date('%s')", query, f.Value)
+			}
 		}
 	}
 
@@ -223,6 +231,8 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 	}
 
 	finalQuery = fmt.Sprintf("%s%s", finalQuery, query)
+
+	fmt.Println(finalQuery)
 
 	err := r.db.Select(&customerCampaigns, finalQuery)
 	if err != nil {
