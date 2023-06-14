@@ -311,6 +311,11 @@ func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest
 		return nil, err
 	}
 
+	err = cs.repository.UpdateSummaryState(status)
+	if err != nil {
+		return nil, err
+	}
+
 	statusResponse := dto.StatusResponse{
 		CampaignId: status.CampaignId,
 		State:      status.State,
