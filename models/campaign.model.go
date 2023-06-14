@@ -26,6 +26,9 @@ type Campaign struct {
 	ServiceType       pq.StringArray `db:"service_type"`
 	Status            string         `db:"status"`
 	TemplateId        uuid.UUID      `db:"template_id"`
+	RejectionNote     *string        `db:"rejection_note"`
+	CreatedAt         *time.Time     `db:"created_at"`
+	UpdatedAt         *time.Time     `db:"updated_at"`
 }
 
 type CampaignSummary struct {

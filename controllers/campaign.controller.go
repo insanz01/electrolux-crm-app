@@ -19,6 +19,7 @@ type CampaignController interface {
 	Customer(c echo.Context) error
 	Filter(c echo.Context) error
 	Status(c echo.Context) error
+	List(c echo.Context) error
 }
 
 type campaignController struct {
@@ -266,5 +267,34 @@ func (cc *campaignController) Status(c echo.Context) error {
 		Status:  1,
 		Message: "success",
 		Data:    campaigns,
+	})
+}
+
+func (cc *campaignController) List(c echo.Context) error {
+	listProperty := dto.ListProperty{}
+
+	c.Bind(&listProperty)
+
+	if listProperty.Property == nil {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid body request",
+			Data:    nil,
+		})
+	}
+
+	listData, err := cc.campaignService.List(c, *listProperty.Property)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    listData,
 	})
 }

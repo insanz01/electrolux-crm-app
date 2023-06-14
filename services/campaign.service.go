@@ -18,6 +18,7 @@ type CampaignService interface {
 	FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error)
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
 	State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error)
+	List(c echo.Context, property string) (*dto.ListResponse, error)
 }
 
 type campaignService struct {
@@ -58,6 +59,9 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 			ServiceType:       campaign.ServiceType,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
+			RejectionNote:     campaign.RejectionNote,
+			CreatedAt:         campaign.CreatedAt,
+			UpdatedAt:         campaign.UpdatedAt,
 		})
 	}
 
@@ -97,6 +101,9 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		ServiceType:       campaign.ServiceType,
 		Status:            campaign.Status,
 		TemplateId:        campaign.TemplateId,
+		RejectionNote:     campaign.RejectionNote,
+		CreatedAt:         campaign.CreatedAt,
+		UpdatedAt:         campaign.UpdatedAt,
 	}
 
 	return &dto.CampaignResponse{
@@ -319,6 +326,9 @@ func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dt
 			ServiceType:       campaign.ServiceType,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
+			RejectionNote:     campaign.RejectionNote,
+			CreatedAt:         campaign.CreatedAt,
+			UpdatedAt:         campaign.UpdatedAt,
 		})
 	}
 
@@ -327,4 +337,28 @@ func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dt
 	}
 
 	return &campaignResponse, nil
+}
+
+func (cs *campaignService) List(c echo.Context, property string) (*dto.ListResponse, error) {
+	lists, err := cs.repository.GetAllCampaign()
+	if err != nil {
+		return nil, err
+	}
+
+	listResponse := []string{}
+	unique := make(map[string]bool)
+	for _, list := range lists {
+		if !unique[list.Name] {
+			unique[list.Name] = true
+			listResponse = append(listResponse, list.Name)
+		}
+	}
+
+	return nil, nil
+
+	// listResponse := []dto.ListData{}
+	// unique := make(map[dto.ListData]bool)
+	// for _, list := range lists {
+	// 	tempList
+	// }
 }
