@@ -142,7 +142,7 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		CampaignId:  id,
 		FailedSent:  "",
 		SuccessSent: "",
-		Status:      "INITIAL",
+		Status:      "WAITING APPROVAL",
 	}
 
 	summaryId, err := r.repository.CreateCampaignSummary(campaignSummary)
@@ -279,11 +279,31 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 	}, nil
 }
 
+func (cs *campaignService) validateState(state string) bool {
+	if state == "ACCEPTED" || state == "REJECTED" || state == "FINISHED" || state == "ON GOING" || state == "WAITING APPROVAL" {
+		return true
+	}
+
+	return false
+}
+
 func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error) {
 	status := models.CampaignStatus{
 		CampaignId: statusRequest.CampaignId,
 		State:      statusRequest.State,
 		Note:       statusRequest.Note,
+	}
+
+	if status.State == "STOP" {
+		status.State = "FINISHED"
+	}
+
+	if status.State == "ACCEPTED" {
+		status.State = "ON GOING"
+	}
+
+	if !cs.validateState(status.State) {
+		return nil, errors.New("invalid state")
 	}
 
 	err := cs.repository.UpdateState(status)

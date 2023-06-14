@@ -36,6 +36,8 @@ const (
 
 	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
 	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, rejection_note = :note, updated_at = NOW() WHERE id = :campaign_id"
+
+	updateSummaryCampaignStateQuery = "UPDATE public.campaign_summary SET status = :state, updated_at = NOW() WHERE campaign_id = :campaign_id"
 )
 
 func (r *Repository) GetAllCampaign() ([]*models.Campaign, error) {
@@ -246,6 +248,17 @@ func (r *Repository) UpdateState(status models.CampaignStatus) error {
 	if status.State == "REJECTED" && status.Note != nil {
 		finalQuery = updateCampaignStateWithNoteQuery
 	}
+
+	_, err := r.db.NamedExec(finalQuery, status)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateSummaryState(status models.CampaignStatus) error {
+	finalQuery := updateSummaryCampaignStateQuery
 
 	_, err := r.db.NamedExec(finalQuery, status)
 	if err != nil {
