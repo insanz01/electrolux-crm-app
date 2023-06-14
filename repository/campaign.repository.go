@@ -35,7 +35,7 @@ const (
 	getAllCustomerCampaignBySummaryIdQuery = "SELECT cc.id, cc.summary_id, cc.customer_id, cc.sent_at, cc.delivered_at, cc.read_at FROM campaign_customer cc WHERE cc.summary_id = $1"
 
 	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
-	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, note = :note, updated_at = NOW() WHERE id = :campaign_id"
+	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, rejection_note = :note, updated_at = NOW() WHERE id = :campaign_id"
 )
 
 func (r *Repository) GetAllCampaign() ([]*models.Campaign, error) {
