@@ -69,3 +69,9 @@ type CampaignCustomerResponses struct {
 type CampaignCustomerResponse struct {
 	CampaignCustomer CampaignCustomer `json:"customer_campaign"`
 }
+
+type StatusResponse struct {
+	CampaignId string  `json:"campaign_id"`
+	State      string  `json:"status"`
+	Note       *string `json:"note"`
+}

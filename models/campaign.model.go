@@ -56,3 +56,9 @@ type CampaignFilterProperties struct {
 	Filters   []string          `db:"filters" json:"filters"`
 	DateRange CampaignDateRange `db:"daterange" json:"daterange"`
 }
+
+type CampaignStatus struct {
+	CampaignId string  `db:"campaign_id"`
+	State      string  `db:"state"`
+	Note       *string `db:"note"`
+}

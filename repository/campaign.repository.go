@@ -18,6 +18,7 @@ type CampaignRepository interface {
 	GetSummaryByCampaignId(id string) (*models.Campaign, error)
 	GetCustomersBySummaryId(summaryId string) ([]*models.CampaignCustomer, error)
 	GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]*models.Campaign, error)
+	UpdateState(status models.CampaignStatus) error
 }
 
 const (
@@ -32,6 +33,9 @@ const (
 
 	getAllSummaryByCampaignIdQuery         = "SELECT s.id, s.campaign_id, s.failed_sent, s.success_sent, s.status, s.created_at, s.updated_at FROM campaign_summary s WHERE s.deleted_at is NULL AND s.campaign_id = $1"
 	getAllCustomerCampaignBySummaryIdQuery = "SELECT cc.id, cc.summary_id, cc.customer_id, cc.sent_at, cc.delivered_at, cc.read_at FROM campaign_customer cc WHERE cc.summary_id = $1"
+
+	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
+	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, note = :note, updated_at = NOW() WHERE id = :campaign_id"
 )
 
 func (r *Repository) GetAllCampaign() ([]*models.Campaign, error) {
@@ -195,6 +199,8 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 
 	finalQuery := getAllCampaignWithFilterQuery
 
+	target := filter.Target
+
 	query := ""
 
 	for _, f := range filter.Filters {
@@ -210,6 +216,12 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 		}
 	}
 
+	if target == "history" {
+		query = fmt.Sprintf("%s AND (status = 'FINISHED' OR status = 'REJECTED')", query)
+	} else {
+		query = fmt.Sprintf("%s AND (status <> 'FINISHED' AND status <> 'REJECTED')", query)
+	}
+
 	finalQuery = fmt.Sprintf("%s%s", finalQuery, query)
 
 	err := r.db.Select(&customerCampaigns, finalQuery)
@@ -218,4 +230,19 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 	}
 
 	return customerCampaigns, nil
+}
+
+func (r *Repository) UpdateState(status models.CampaignStatus) error {
+	finalQuery := updateCampaignStateQuery
+
+	if status.State == "REJECTED" && status.Note != nil {
+		finalQuery = updateCampaignStateWithNoteQuery
+	}
+
+	_, err := r.db.NamedExec(finalQuery, status)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

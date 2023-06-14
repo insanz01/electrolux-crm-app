@@ -17,7 +17,7 @@ type CampaignService interface {
 	FindSummary(c echo.Context, id string) (*dto.SummaryCampaignResponse, error)
 	FindCustomerBySummary(c echo.Context, summaryId string) (*dto.CampaignCustomerResponses, error)
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
-	Status(c echo.Context) error
+	State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error)
 }
 
 type campaignService struct {
@@ -259,9 +259,23 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 	}, nil
 }
 
-func (cs *campaignService) Status(c echo.Context) error {
+func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error) {
+	status := models.CampaignStatus{
+		CampaignId: statusRequest.CampaignId,
+		State:      statusRequest.State,
+	}
 
-	return nil
+	err := cs.repository.UpdateState(status)
+	if err != nil {
+		return nil, err
+	}
+
+	statusResponse := dto.StatusResponse{
+		CampaignId: status.CampaignId,
+		State:      status.State,
+	}
+
+	return &statusResponse, nil
 }
 
 func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dto.CampaignProperties) (*dto.CampaignsResponse, error) {

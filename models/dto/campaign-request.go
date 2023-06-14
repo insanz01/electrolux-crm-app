@@ -70,6 +70,12 @@ type CampaignFilter struct {
 }
 
 type CampaignProperties struct {
-	Properties []*string         `json:"properties"`
-	Filters    []*CampaignFilter `json:"filters"`
+	Target  string            `json:"target"`
+	Filters []*CampaignFilter `json:"filters"`
+}
+
+type StatusRequest struct {
+	State      string  `json:"state"`
+	CampaignId string  `json:"campaign_id"`
+	Note       *string `json:"note"`
 }
