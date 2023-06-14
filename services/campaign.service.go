@@ -132,6 +132,8 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		TemplateId:        campaignRequest.TemplateId,
 	}
 
+	campaignInsert.Status = "WAITING APPROVAL"
+
 	id, err := r.repository.InsertCampaign(campaignInsert)
 	if err != nil {
 		fmt.Println("error satu", err.Error())
