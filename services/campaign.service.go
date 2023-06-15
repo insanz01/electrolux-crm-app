@@ -20,6 +20,7 @@ type CampaignService interface {
 	Insert(c echo.Context, campaign dto.CampaignParsedRequest) (*dto.CampaignResponse, error)
 	State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error)
 	List(c echo.Context, property string) (*dto.CampaignListResponse, error)
+	FilterCustomer(c echo.Context, sumaryId string, phoneCustomer dto.PhoneCustomerFilter) (*dto.CampaignCustomerResponses, error)
 }
 
 type campaignService struct {
@@ -286,7 +287,6 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 				ReadAt:      customer.ReadAt,
 			})
 		}
-
 	}
 
 	return &dto.CampaignCustomerResponses{
@@ -398,5 +398,58 @@ func (cs *campaignService) List(c echo.Context, property string) (*dto.CampaignL
 
 	return &dto.CampaignListResponse{
 		ListData: listResponse,
+	}, nil
+}
+
+func (cs *campaignService) FilterCustomer(c echo.Context, summaryId string, phoneCustomer dto.PhoneCustomerFilter) (*dto.CampaignCustomerResponses, error) {
+	customerCampaigns, err := cs.repository.GetCustomersBySummaryId(summaryId)
+	if err != nil {
+		return nil, err
+	}
+
+	if customerCampaigns == nil {
+		return nil, errors.New("no customer data")
+	}
+
+	customerCampaignResp := []dto.CampaignCustomer{}
+	for _, customer := range customerCampaigns {
+		customerDetail, _ := cs.repository.GetSingle(customer.CustomerId)
+
+		custMobileNo := ""
+		state := "Invalid"
+
+		for _, c := range customerDetail {
+			if c.Key == "mobile_no" {
+				custMobileNo = c.Value
+			}
+		}
+
+		if custMobileNo != "" {
+
+			custMobileNo = strings.Replace(custMobileNo, "+", "", -1)
+
+			if strings.HasPrefix(custMobileNo, "628") {
+				state = "Valid"
+			}
+
+			if custMobileNo == phoneCustomer.PhoneNumber {
+				customerCampaignResp = append(customerCampaignResp, dto.CampaignCustomer{
+					Id:         customer.Id,
+					SummaryId:  customer.SummaryId,
+					CustomerId: customer.CustomerId,
+					CustomerDetail: dto.CampaignCustomerDetail{
+						PhoneNumber: custMobileNo,
+						State:       state,
+					},
+					SentAt:      customer.SentAt,
+					DeliveredAt: customer.DeliveredAt,
+					ReadAt:      customer.ReadAt,
+				})
+			}
+		}
+	}
+
+	return &dto.CampaignCustomerResponses{
+		CampaignCustomers: customerCampaignResp,
 	}, nil
 }

@@ -33,6 +33,7 @@ const (
 
 	getAllSummaryByCampaignIdQuery         = "SELECT s.id, s.campaign_id, s.failed_sent, s.success_sent, s.status, s.created_at, s.updated_at FROM campaign_summary s WHERE s.deleted_at is NULL AND s.campaign_id = $1"
 	getAllCustomerCampaignBySummaryIdQuery = "SELECT cc.id, cc.summary_id, cc.customer_id, cc.sent_at, cc.delivered_at, cc.read_at FROM campaign_customer cc WHERE cc.summary_id = $1"
+	// getSingleCustomerCampaignByPhoneAndSummaryIdQuery = "SELECT cc.id, cc.summary_id, cc.customer_id, cc.sent_at, cc.delivered_at, cc.read_at FROM campaign_customer cc WHERE cc.summary_id = $1"
 
 	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
 	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, rejection_note = :note, updated_at = NOW() WHERE id = :campaign_id"
@@ -195,6 +196,17 @@ func (r *Repository) GetCustomersBySummaryId(summaryId string) ([]*models.Campai
 
 	return customerCampaigns, nil
 }
+
+// func (r *Repository) GetSingleCustomerByPhoneAndSummaryId(summaryId string, phoneNumber dto.PhoneCustomerFilter) ([]*models.CampaignCustomer, error) {
+// 	var customerCampaigns []*models.CampaignCustomer
+
+// 	err := r.db.Select(&customerCampaigns, getSingleCustomerCampaignByPhoneAndSummaryIdQuery, summaryId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return customerCampaigns, nil
+// }
 
 func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]*models.Campaign, error) {
 	var customerCampaigns []*models.Campaign

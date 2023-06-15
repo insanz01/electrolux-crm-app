@@ -79,3 +79,7 @@ type StatusRequest struct {
 	CampaignId string  `json:"campaign_id"`
 	Note       *string `json:"note"`
 }
+
+type PhoneCustomerFilter struct {
+	PhoneNumber string `query:"phone_number"`
+}

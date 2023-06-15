@@ -20,6 +20,7 @@ type CampaignController interface {
 	Filter(c echo.Context) error
 	Status(c echo.Context) error
 	List(c echo.Context) error
+	FilterCustomer(c echo.Context) error
 }
 
 type campaignController struct {
@@ -284,6 +285,45 @@ func (cc *campaignController) List(c echo.Context) error {
 	}
 
 	listData, err := cc.campaignService.List(c, *listProperty.Property)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    listData,
+	})
+}
+
+func (cc *campaignController) FilterCustomer(c echo.Context) error {
+	phoneCustomer := dto.PhoneCustomerFilter{}
+
+	summaryId := c.Param("summary_id")
+
+	c.Bind(&phoneCustomer)
+
+	if phoneCustomer.PhoneNumber == "" {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid body request",
+			Data:    nil,
+		})
+	}
+
+	if summaryId == "" {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid parameter",
+			Data:    nil,
+		})
+	}
+
+	listData, err := cc.campaignService.FilterCustomer(c, summaryId, phoneCustomer)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{
 			Status:  0,
