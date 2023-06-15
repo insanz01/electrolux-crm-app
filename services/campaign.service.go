@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -256,6 +257,7 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 		customerDetail, _ := cs.repository.GetSingle(customer.CustomerId)
 
 		custMobileNo := ""
+		state := "Invalid"
 
 		for _, c := range customerDetail {
 			if c.Key == "mobile_no" {
@@ -263,17 +265,28 @@ func (cs *campaignService) FindCustomerBySummary(c echo.Context, summaryId strin
 			}
 		}
 
-		customerCampaignResp = append(customerCampaignResp, dto.CampaignCustomer{
-			Id:         customer.Id,
-			SummaryId:  customer.SummaryId,
-			CustomerId: customer.CustomerId,
-			CustomerDetail: dto.CampaignCustomerDetail{
-				PhoneNumber: custMobileNo,
-			},
-			SentAt:      customer.SentAt,
-			DeliveredAt: customer.DeliveredAt,
-			ReadAt:      customer.ReadAt,
-		})
+		if custMobileNo != "" {
+
+			custMobileNo = strings.Replace(custMobileNo, "+", "", -1)
+
+			if strings.HasPrefix(custMobileNo, "628") {
+				state = "Valid"
+			}
+
+			customerCampaignResp = append(customerCampaignResp, dto.CampaignCustomer{
+				Id:         customer.Id,
+				SummaryId:  customer.SummaryId,
+				CustomerId: customer.CustomerId,
+				CustomerDetail: dto.CampaignCustomerDetail{
+					PhoneNumber: custMobileNo,
+					State:       state,
+				},
+				SentAt:      customer.SentAt,
+				DeliveredAt: customer.DeliveredAt,
+				ReadAt:      customer.ReadAt,
+			})
+		}
+
 	}
 
 	return &dto.CampaignCustomerResponses{

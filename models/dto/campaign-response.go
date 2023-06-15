@@ -58,6 +58,7 @@ type SummaryCampaignResponse struct {
 
 type CampaignCustomerDetail struct {
 	PhoneNumber string `json:"phone_number"`
+	State       string `json:"state"`
 }
 
 type CampaignCustomer struct {
