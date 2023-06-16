@@ -43,6 +43,7 @@ func Init() *echo.Echo {
 	giftService := services.NewGiftService(repo)
 	campaignService := services.NewCampaignService(repo)
 	productLineService := services.NewProductLineService(repo)
+	reportService := services.NewReportService(repo)
 
 	loginController := controllers.NewLoginController(repo)
 	customerController := controllers.NewCustomerController(customerService)
@@ -50,6 +51,7 @@ func Init() *echo.Echo {
 	giftController := controllers.NewGiftController(giftService)
 	campaignController := controllers.NewCampaignController(campaignService)
 	productLineController := controllers.NewProductLineController(productLineService)
+	reportController := controllers.NewReportController(reportService)
 
 	// Middleware CORS
 	e.Use(middleware.CORS())
@@ -111,6 +113,8 @@ func Init() *echo.Echo {
 	api.POST("/files", fileController.Upload)
 	api.GET("/files/:uuid", fileController.GetFile)
 	api.GET("/files/invalid", fileController.GetAllInvalidFile)
+
+	api.GET("/reports", reportController.FindAll)
 
 	api.GET("/product-lines", productLineController.FindAll)
 	api.POST("/product-lines", productLineController.Insert)
