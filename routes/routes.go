@@ -44,6 +44,8 @@ func Init() *echo.Echo {
 	campaignService := services.NewCampaignService(repo)
 	productLineService := services.NewProductLineService(repo)
 	reportService := services.NewReportService(repo)
+	clientService := services.NewClientService(repo)
+	channelService := services.NewChannelService(repo)
 
 	loginController := controllers.NewLoginController(repo)
 	customerController := controllers.NewCustomerController(customerService)
@@ -52,6 +54,8 @@ func Init() *echo.Echo {
 	campaignController := controllers.NewCampaignController(campaignService)
 	productLineController := controllers.NewProductLineController(productLineService)
 	reportController := controllers.NewReportController(reportService)
+	channelController := controllers.NewChannelController(channelService)
+	clientController := controllers.NewClientController(clientService)
 
 	// Middleware CORS
 	e.Use(middleware.CORS())
@@ -118,6 +122,11 @@ func Init() *echo.Echo {
 
 	api.GET("/product-lines", productLineController.FindAll)
 	api.POST("/product-lines", productLineController.Insert)
+
+	api.GET("/channels", channelController.FindAll)
+	api.GET("/channel-accounts", channelController.FindAllAccount)
+
+	api.GET("/clients", clientController.FindAll)
 
 	api.GET("/lists", customerController.List)
 
