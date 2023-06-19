@@ -42,6 +42,17 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 	var allCampaigns []dto.Campaign
 
 	for _, campaign := range campaigns {
+		// segment ini belum ditambahkan
+		client, _ := r.repository.GetSingleClient(campaign.ClientId.String())
+
+		clientName := ""
+		if client != nil {
+			clientName = client.Name
+		}
+
+		fmt.Println(clientName)
+		// akhir dari segment client
+
 		allCampaigns = append(allCampaigns, dto.Campaign{
 			Id:                campaign.Id,
 			Name:              campaign.Name,
@@ -83,6 +94,17 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	if campaign == nil {
 		return nil, errors.New("no data find by id")
 	}
+
+	// segment ini belum ditambahkan
+	client, _ := r.repository.GetSingleClient(campaign.ClientId.String())
+
+	clientName := ""
+	if client != nil {
+		clientName = client.Name
+	}
+
+	fmt.Println(clientName)
+	// akhir dari segment client
 
 	singleCampaign := dto.Campaign{
 		Id:                campaign.Id,

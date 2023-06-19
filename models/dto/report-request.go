@@ -6,3 +6,12 @@ type ReportDownloadRequest struct {
 	ChannelId    string `json:"channel_id"`
 	Status       string `json:"status"`
 }
+
+type ReportFilter struct {
+	Property string `json:"property"`
+	Value    string `json:"value"`
+}
+
+type ReportProperties struct {
+	Filters []*ReportFilter `json:"filters"`
+}
