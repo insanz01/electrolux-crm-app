@@ -14,3 +14,7 @@ type ReportResponse struct {
 type ReportResponses struct {
 	ReportResponses []ReportResponse `json:"reports"`
 }
+
+type ReportDownloadResponse struct {
+	FilePath string `json:"file_path"`
+}

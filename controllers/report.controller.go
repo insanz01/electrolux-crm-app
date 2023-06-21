@@ -12,6 +12,8 @@ import (
 type ReportController interface {
 	FindAll(c echo.Context) error
 	Filter(c echo.Context) error
+	Request(c echo.Context) error
+	Download(c echo.Context) error
 }
 
 type reportController struct {
@@ -67,5 +69,41 @@ func (rc *reportController) Filter(c echo.Context) error {
 		Status:  1,
 		Message: "success",
 		Data:    reports,
+	})
+}
+
+func (rc *reportController) Request(c echo.Context) error {
+	requestDownload := dto.ReportDownloadRequest{}
+
+	c.Bind(&requestDownload)
+
+	// report, err := rc.reportService
+
+	return nil
+}
+
+func (rc *reportController) Download(c echo.Context) error {
+	campaignId := c.Param("campaign_id")
+	if campaignId == "" {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid parameter",
+			Data:    nil,
+		})
+	}
+
+	fileReport, err := rc.reportService.Download(c, campaignId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    fileReport,
 	})
 }

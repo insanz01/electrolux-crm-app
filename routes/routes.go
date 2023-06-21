@@ -119,6 +119,7 @@ func Init() *echo.Echo {
 	api.GET("/files/invalid", fileController.GetAllInvalidFile)
 
 	api.GET("/reports", reportController.FindAll)
+	api.GET("/reports/:campaign_id", reportController.Download)
 	api.POST("/reports/filter", reportController.Filter)
 
 	api.GET("/product-lines", productLineController.FindAll)
