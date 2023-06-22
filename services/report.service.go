@@ -126,7 +126,7 @@ func (rs *reportService) Download(c echo.Context, id string) (*dto.ReportDownloa
 }
 
 func (rs *reportService) generateFile(id string, reports []*models.DownloadReport) (string, error) {
-	fileName := fmt.Sprintf("uploads/%s.xlsx", id)
+	fileName := fmt.Sprintf("%s.xlsx", id)
 
 	file := excelize.NewFile()
 
@@ -188,7 +188,7 @@ func (rs *reportService) generateFile(id string, reports []*models.DownloadRepor
 		file.SetCellValue("Sheet1", fmt.Sprintf("Z%d", cellNumber), report.FailedDetail)
 	}
 
-	if err := file.SaveAs(fileName); err != nil {
+	if err := file.SaveAs("uploads/" + fileName); err != nil {
 		return "", err
 	}
 
