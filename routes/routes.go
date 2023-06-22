@@ -121,6 +121,7 @@ func Init() *echo.Echo {
 	api.GET("/reports", reportController.FindAll)
 	api.GET("/reports/:campaign_id", reportController.Download)
 	api.POST("/reports/filter", reportController.Filter)
+	api.POST("/reports/request", reportController.Request)
 
 	api.GET("/product-lines", productLineController.FindAll)
 	api.POST("/product-lines", productLineController.Insert)

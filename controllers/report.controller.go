@@ -77,9 +77,20 @@ func (rc *reportController) Request(c echo.Context) error {
 
 	c.Bind(&requestDownload)
 
-	// report, err := rc.reportService
+	fileReport, err := rc.reportService.Request(c, requestDownload)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
 
-	return nil
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    fileReport,
+	})
 }
 
 func (rc *reportController) Download(c echo.Context) error {

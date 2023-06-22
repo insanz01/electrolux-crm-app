@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
@@ -74,8 +76,53 @@ func (rs *reportService) FindAllByFilter(c echo.Context, filter dto.ReportProper
 }
 
 func (rs *reportService) Request(c echo.Context, request dto.ReportDownloadRequest) (*dto.ReportDownloadResponse, error) {
+	reports, err := rs.repository.GetRequestDownloadReport(request)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	theReports := []*models.DownloadReport{}
+	for _, report := range reports {
+		customerDetail, _ := rs.repository.GetSingle(report.CustomerId)
+
+		custMobileNo := ""
+		state := "true"
+
+		for _, c := range customerDetail {
+			if c.Key == "mobile_no" {
+				custMobileNo = c.Value
+			}
+		}
+
+		if custMobileNo != "" {
+			report.Contact = custMobileNo
+			state = "false"
+		}
+
+		report.Invalid = state
+
+		theReports = append(theReports, report)
+	}
+
+	currentTime := time.Now()
+	id := strconv.Itoa(int(currentTime.Unix()))
+
+	filename, err := rs.generateFile(id, theReports)
+	if err != nil {
+		return nil, err
+	}
+
+	req := c.Request()
+	urlSchema := req.URL.Scheme
+	if urlSchema == "" {
+		urlSchema = "http"
+	}
+
+	url := fmt.Sprintf("%s://%s/assets/", urlSchema, req.Host)
+
+	return &dto.ReportDownloadResponse{
+		FilePath: url + filename,
+	}, nil
 }
 
 func (rs *reportService) Download(c echo.Context, id string) (*dto.ReportDownloadResponse, error) {
