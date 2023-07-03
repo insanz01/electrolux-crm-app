@@ -99,7 +99,7 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		})
 	}
 
-	purchaseEndDate, err := time.Parse("2006-01-02", campaignInsert.PurchaseStartDate)
+	purchaseEndDate, err := time.Parse("2006-01-02", campaignInsert.PurchaseEndDate)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.Response{
 			Status:  0,
@@ -108,7 +108,7 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		})
 	}
 
-	scheduledDate, err := time.Parse("2006-01-02", campaignInsert.PurchaseStartDate)
+	scheduledDate, err := time.Parse("2006-01-02", campaignInsert.ScheduleDate)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.Response{
 			Status:  0,
