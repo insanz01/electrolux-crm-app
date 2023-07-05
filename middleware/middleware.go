@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/helpers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
@@ -22,7 +21,7 @@ func AuthSSO() echo.MiddlewareFunc {
 			if token == "" {
 				return c.JSON(http.StatusUnauthorized, models.Response{
 					Status:  0,
-					Message: "invalid token",
+					Message: "invalid sso token",
 					Data:    nil,
 				})
 			}
@@ -71,14 +70,19 @@ func CheckToken(ctx context.Context, token string) (*TokenDetail, error) {
 		"token":  token,
 	})
 
-	baseURL := "http://192.168.217.8:8000?code="
-	baseURL = fmt.Sprintf("%s%s", baseURL, token)
+	baseURL := "https://login.coster.id/introspect"
+	queryURL := "?code="
+	queryURL = fmt.Sprintf("%s%s", queryURL, token)
 
-	url, err := url.JoinPath(baseURL, "/introspect")
-	if err != nil {
-		logger.WithError(err).Error("failed to join path")
-		return nil, err
-	}
+	url := fmt.Sprintf("%s%s", baseURL, queryURL)
+
+	// url, err := url.JoinPath(baseURL, queryURL)
+	// if err != nil {
+	// 	logger.WithError(err).Error("failed to join path")
+	// 	return nil, err
+	// }
+
+	fmt.Println(url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
 	if err != nil {
@@ -98,10 +102,14 @@ func CheckToken(ctx context.Context, token string) (*TokenDetail, error) {
 
 	defer helpers.WrapCloser(resp.Body.Close)
 
+	fmt.Println(resp)
+
 	switch resp.StatusCode {
 	default:
+		fmt.Println("gagal")
 		return nil, handleCheckTokenErrorResponse(resp.Body)
 	case http.StatusOK:
+		fmt.Println("berhasil")
 		return handleCheckTokenResponse(resp.Body)
 	}
 }
@@ -120,10 +128,10 @@ func handleCheckTokenErrorResponse(body io.ReadCloser) error {
 }
 
 func handleCheckTokenResponse(body io.ReadCloser) (*TokenDetail, error) {
-	var resp *CheckTokenResponse
+	var resp *TokenDetail
 	if err := json.NewDecoder(body).Decode(&resp); err != nil {
 		return nil, err
 	}
 
-	return resp.Data, nil
+	return resp, nil
 }

@@ -8,6 +8,7 @@ import (
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/controllers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/db"
 	_ "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/docs"
+	authMiddleware "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/middleware"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
 
@@ -79,7 +80,7 @@ func Init() *echo.Echo {
 
 	e.GET("/assets/:filename", fileController.Download)
 
-	api := e.Group("api/v1")
+	api := e.Group("api/v1", authMiddleware.AuthSSO())
 
 	api.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, this is echo!")
