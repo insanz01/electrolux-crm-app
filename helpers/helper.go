@@ -3,9 +3,11 @@ package helpers
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var customerMandatory = []string{"Service Order No", "Mobile No", "Product Line Alpha - Numeric", "Date Of Purchase", "City", "State", "Country", "Call Type", "Model Description"}
@@ -108,4 +110,42 @@ func CheckDate(keyName string) bool {
 	}
 
 	return false
+}
+
+func WrapCloser(closeFn func() error) {
+	if err := closeFn(); err != nil {
+		log.Println(err)
+	}
+}
+
+// GetTokenFromHeader get token from header authorization with bearer token
+func GetTokenFromHeader(req *http.Request) string {
+	_headerAuthorization := "Authorization"
+	_authScheme := "Bearer"
+	authHeader := strings.Split(req.Header.Get(_headerAuthorization), " ")
+
+	if len(authHeader) != 2 || authHeader[0] != _authScheme {
+		return ""
+	}
+
+	return strings.TrimSpace(authHeader[1])
+}
+
+// GenerateOpenAPIResponse generate response for open api in case of a success response
+func GenerateOpenAPIResponse(data interface{}) map[string]any {
+	return map[string]any{
+		"status":  1,
+		"message": "",
+		"data":    data,
+	}
+}
+
+// GenerateOpenAPIErrorResponse generate response for open api in case of an error response
+func GenerateOpenAPIErrorResponse(httpErrorCode int) map[string]any {
+	type empty struct{}
+	return map[string]any{
+		"status":  0,
+		"message": http.StatusText(httpErrorCode),
+		"data":    empty{},
+	}
 }
