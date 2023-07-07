@@ -13,7 +13,7 @@ type FileService interface {
 	GetAllDocument(c echo.Context) ([]*dto.FileResponse, error)
 	GetAllDocumentWithFilter(c echo.Context, filters dto.FileFilterRequest) ([]*dto.FileResponse, error)
 	GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error)
-	Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.FileResponse, error)
+	Insert(c echo.Context, fileUpload dto.FileRequest, userInfo models.AuthSSO) (*dto.FileResponse, error)
 	GetAllInvalidDocument(c echo.Context) ([]*dto.InvalidFileResponse, error)
 	GetInvalidDocument(c echo.Context, uuid string) (*dto.InvalidFileResponse, error)
 }
@@ -138,13 +138,15 @@ func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileRespon
 	return &fileResponse, nil
 }
 
-func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest) (*dto.FileResponse, error) {
+func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest, userInfo models.AuthSSO) (*dto.FileResponse, error) {
 	inputFile := models.FileExcelDocument{
-		Filename:     fileUpload.File.Filename,
-		Category:     fileUpload.Category,
-		NumOfFailed:  0,
-		NumOfSuccess: 0,
-		Status:       "process",
+		Filename:         fileUpload.File.Filename,
+		Category:         fileUpload.Category,
+		NumOfFailed:      0,
+		NumOfSuccess:     0,
+		Status:           "process",
+		UploadByUserId:   userInfo.User.ID,
+		UploadByUserName: userInfo.User.Name,
 	}
 
 	fmt.Println(inputFile)

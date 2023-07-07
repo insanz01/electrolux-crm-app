@@ -83,6 +83,9 @@ func Init() *echo.Echo {
 	api := e.Group("api/v1", authMiddleware.AuthSSO())
 
 	api.GET("/", func(c echo.Context) error {
+		userInfo := c.Get("auth_token")
+		fmt.Println(userInfo)
+
 		return c.String(http.StatusOK, "Hello, this is echo!")
 	})
 

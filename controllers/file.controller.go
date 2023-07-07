@@ -126,7 +126,16 @@ func (fc *fileController) Upload(c echo.Context) error {
 		})
 	}
 
-	fileResponse, err := fc.fileService.Insert(c, fileUpload)
+	userInfo := c.Get("auth_token").(*models.AuthSSO)
+	if userInfo == nil {
+		return c.JSON(http.StatusUnauthorized, models.Response{
+			Status:  0,
+			Message: "invalid sso token",
+			Data:    nil,
+		})
+	}
+
+	fileResponse, err := fc.fileService.Insert(c, fileUpload, *userInfo)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,

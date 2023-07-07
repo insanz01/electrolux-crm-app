@@ -1,17 +1,19 @@
 package models
 
 type FileExcelDocument struct {
-	Id              string  `db:"id"`
-	Filename        string  `db:"filename"`
-	Category        string  `db:"category"`
-	NumOfFailed     int     `db:"num_of_failed"`
-	NumOfSuccess    int     `db:"num_of_success"`
-	Status          string  `db:"status"`
-	InvalidFilename *string `db:"invalid_filename"` // invalid table
-	IsValid         *bool   `db:"is_valid"`         // invalid table
-	CreatedAt       string  `db:"created_at"`
-	UpdatedAt       string  `db:"updated_at"`
-	DeletedAt       *string `db:"deleted_at"`
+	Id               string  `db:"id"`
+	Filename         string  `db:"filename"`
+	Category         string  `db:"category"`
+	NumOfFailed      int     `db:"num_of_failed"`
+	NumOfSuccess     int     `db:"num_of_success"`
+	Status           string  `db:"status"`
+	InvalidFilename  *string `db:"invalid_filename"` // invalid table
+	IsValid          *bool   `db:"is_valid"`         // invalid table
+	UploadByUserId   string  `db:"upload_by_user_id"`
+	UploadByUserName string  `db:"upload_by_user_name"`
+	CreatedAt        string  `db:"created_at"`
+	UpdatedAt        string  `db:"updated_at"`
+	DeletedAt        *string `db:"deleted_at"`
 }
 
 type InvalidFileExcelDocument struct {

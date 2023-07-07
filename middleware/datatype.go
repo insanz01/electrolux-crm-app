@@ -3,7 +3,7 @@ package middleware
 type contextkey string
 
 // AuthTokenKey is the key to get token detail from echo context
-const AuthTokenKey contextkey = "git-rbi.jatismobile.com/jatis_chatcommerce/open-api-inventory/auth/auth.TokenDetail"
+const AuthTokenKey contextkey = "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/models.TokenDetail"
 
 // TokenDetail is the field contained in token
 type TokenDetail struct {

@@ -9,7 +9,7 @@ import (
 )
 
 type FileRepository interface {
-	UploadFile(filename string) (string, error)
+	UploadFile(insertFile models.FileExcelDocument) (string, error)
 	GetAllFile() ([]*models.FileExcelDocument, error)
 	GetFile(id string) (*models.FileExcelDocument, error)
 	GetAllFileWithFilter(filters []dto.FileFilter) ([]*models.FileExcelDocument, error)
@@ -18,7 +18,7 @@ type FileRepository interface {
 }
 
 const (
-	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status) returning id"
+	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status, upload_by_user_id, upload_by_user_name) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status, :upload_by_user_id, :upload_by_user_name) returning id"
 	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
 	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE deleted_at is NULL"
 	getAllFileV2Query      = "SELECT ed.id, ed.filename, ed.category, ed.num_of_failed, ed.num_of_success, ed.status, edi.filename as invalid_filename, edi.is_valid, ed.created_at, ed.updated_at, ed.deleted_at FROM public.excel_document ed LEFT JOIN public.excel_document_invalid edi ON ed.id = edi.id WHERE ed.deleted_at is NULL"

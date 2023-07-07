@@ -34,6 +34,8 @@ func AuthSSO() echo.MiddlewareFunc {
 			ctx := c.Request().Context()
 			newCtx := setTokenToCtx(ctx, *tokenDetail)
 
+			c.Set("auth_token", *tokenDetail)
+
 			c.SetRequest(c.Request().WithContext(newCtx))
 
 			return next(c)
@@ -81,8 +83,6 @@ func CheckToken(ctx context.Context, token string) (*TokenDetail, error) {
 	// 	logger.WithError(err).Error("failed to join path")
 	// 	return nil, err
 	// }
-
-	fmt.Println(url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
 	if err != nil {
