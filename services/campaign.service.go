@@ -43,7 +43,7 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 
 	for _, campaign := range campaigns {
 		// segment ini belum ditambahkan
-		client, _ := r.repository.GetSingleClient(campaign.ClientId.String())
+		client, _ := r.repository.GetSingleClient(campaign.ClientId)
 
 		clientName := ""
 		if client != nil {
@@ -70,9 +70,13 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 			PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
 			ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
 			ServiceType:       campaign.ServiceType,
+			HeaderParameter:   campaign.HeaderParameter,
+			BodyParameter:     campaign.BodyParameter,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
 			RejectionNote:     campaign.RejectionNote,
+			SubmitByUserId:    campaign.SubmitByUserId,
+			SubmitByUserName:  campaign.SubmitByUserName,
 			CreatedAt:         campaign.CreatedAt,
 			UpdatedAt:         campaign.UpdatedAt,
 		})
@@ -96,7 +100,7 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	}
 
 	// segment ini belum ditambahkan
-	client, _ := r.repository.GetSingleClient(campaign.ClientId.String())
+	client, _ := r.repository.GetSingleClient(campaign.ClientId)
 
 	clientName := ""
 	if client != nil {
@@ -152,8 +156,12 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		PurchaseEndDate:   campaignRequest.PurchaseEndDate,
 		ScheduleDate:      campaignRequest.ScheduleDate,
 		ServiceType:       campaignRequest.ServiceType,
+		HeaderParameter:   campaignRequest.HeaderParameter,
+		BodyParameter:     campaignRequest.BodyParameter,
 		Status:            campaignRequest.Status,
 		TemplateId:        campaignRequest.TemplateId,
+		SubmitByUserId:    campaignRequest.SubmitByUserId,
+		SubmitByUserName:  campaignRequest.SubmitByUserName,
 	}
 
 	campaignInsert.Status = "WAITING APPROVAL"

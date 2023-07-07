@@ -119,6 +119,8 @@ func (cc *campaignController) Insert(c echo.Context) error {
 
 	fmt.Println(campaignInsert)
 
+	userInfo := c.Get("auth_token").(*models.AuthSSO)
+
 	parsedRequest := dto.CampaignParsedRequest{
 		Name:              campaignInsert.Name,
 		ChannelAccountId:  campaignInsert.ChannelAccountId,
@@ -135,8 +137,12 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		PurchaseEndDate:   &purchaseEndDate,
 		ScheduleDate:      &scheduledDate,
 		ServiceType:       campaignInsert.ServiceType,
+		HeaderParameter:   campaignInsert.HeaderParameter,
+		BodyParameter:     campaignInsert.BodyParameter,
 		Status:            "WAITING APPROVAL",
 		TemplateId:        campaignInsert.TemplateId,
+		SubmitByUserId:    userInfo.User.ID,
+		SubmitByUserName:  userInfo.User.Name,
 	}
 
 	campaign, err := cc.campaignService.Insert(c, parsedRequest)

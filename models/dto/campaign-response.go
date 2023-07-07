@@ -2,15 +2,13 @@ package dto
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Campaign struct {
 	Id                string     `json:"id"`
 	Name              string     `json:"name"`
-	ChannelAccountId  uuid.UUID  `json:"channel_account_id"`
-	ClientId          uuid.UUID  `json:"client_id"`
+	ChannelAccountId  string     `json:"channel_account_id"`
+	ClientId          string     `json:"client_id"`
 	City              []string   `json:"city"`
 	CountRepeat       *int       `json:"count_repeat"`
 	IsRepeated        bool       `json:"is_repeated"`
@@ -23,9 +21,13 @@ type Campaign struct {
 	PurchaseEndDate   string     `json:"purchase_end_date"`
 	ScheduleDate      string     `json:"schedule_date"`
 	ServiceType       []string   `json:"service_type"`
+	HeaderParameter   []string   `json:"header_parameter"`
+	BodyParameter     []string   `json:"body_parameter"`
 	Status            string     `json:"status"`
-	TemplateId        uuid.UUID  `json:"template_id"`
+	TemplateId        string     `json:"template_id"`
 	RejectionNote     *string    `json:"rejection_note"`
+	SubmitByUserId    string     `json:"submit_by_user_id"`
+	SubmitByUserName  string     `json:"submit_by_user_name"`
 	CreatedAt         *time.Time `json:"created_at"`
 	UpdatedAt         *time.Time `json:"updated_at"`
 }

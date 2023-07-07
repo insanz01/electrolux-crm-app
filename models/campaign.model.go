@@ -3,15 +3,14 @@ package models
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
 type Campaign struct {
 	Id                string         `db:"id"`
 	Name              string         `db:"name"`
-	ChannelAccountId  uuid.UUID      `db:"channel_account_id"`
-	ClientId          uuid.UUID      `db:"client_id"`
+	ChannelAccountId  string         `db:"channel_account_id"`
+	ClientId          string         `db:"client_id"`
 	City              pq.StringArray `db:"city"`
 	CountRepeat       *int           `db:"count_repeat"`
 	NumOfOccurence    int            `db:"num_of_occurence"`
@@ -24,9 +23,13 @@ type Campaign struct {
 	PurchaseEndDate   *time.Time     `db:"purchase_end_date"`
 	ScheduleDate      *time.Time     `db:"schedule_date"`
 	ServiceType       pq.StringArray `db:"service_type"`
+	HeaderParameter   pq.StringArray `db:"header_parameter"`
+	BodyParameter     pq.StringArray `db:"body_parameter"`
 	Status            string         `db:"status"`
-	TemplateId        uuid.UUID      `db:"template_id"`
+	TemplateId        string         `db:"template_id"`
 	RejectionNote     *string        `db:"rejection_note"`
+	SubmitByUserId    string         `db:"submit_by_user_id"`
+	SubmitByUserName  string         `db:"submit_by_user_name"`
 	CreatedAt         *time.Time     `db:"created_at"`
 	UpdatedAt         *time.Time     `db:"updated_at"`
 }
@@ -63,5 +66,5 @@ type CampaignFilterProperties struct {
 type CampaignStatus struct {
 	CampaignId string  `db:"campaign_id"`
 	State      string  `db:"state"`
-	Note       *string `db:"note"`
+	Note       *string `db:"rejection_note"`
 }
