@@ -74,6 +74,7 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 			BodyParameter:     campaign.BodyParameter,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
+			TemplateName:      campaign.TemplateName,
 			RejectionNote:     campaign.RejectionNote,
 			SubmitByUserId:    campaign.SubmitByUserId,
 			SubmitByUserName:  campaign.SubmitByUserName,
@@ -129,6 +130,7 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		ServiceType:       campaign.ServiceType,
 		Status:            campaign.Status,
 		TemplateId:        campaign.TemplateId,
+		TemplateName:      campaign.TemplateName,
 		RejectionNote:     campaign.RejectionNote,
 		CreatedAt:         campaign.CreatedAt,
 		UpdatedAt:         campaign.UpdatedAt,
@@ -160,6 +162,7 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		BodyParameter:     campaignRequest.BodyParameter,
 		Status:            campaignRequest.Status,
 		TemplateId:        campaignRequest.TemplateId,
+		TemplateName:      campaignRequest.TemplateName,
 		SubmitByUserId:    campaignRequest.SubmitByUserId,
 		SubmitByUserName:  campaignRequest.SubmitByUserName,
 	}
@@ -241,6 +244,9 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		ServiceType:       campaignRequest.ServiceType,
 		Status:            campaignRequest.Status,
 		TemplateId:        campaignRequest.TemplateId,
+		TemplateName:      campaignRequest.TemplateName,
+		SubmitByUserId:    campaignRequest.SubmitByUserId,
+		SubmitByUserName:  campaignRequest.SubmitByUserName,
 	}
 
 	return &dto.CampaignResponse{
@@ -398,6 +404,9 @@ func (cs *campaignService) FindAllByFilter(c echo.Context, campaignProperties dt
 			ServiceType:       campaign.ServiceType,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
+			TemplateName:      campaign.TemplateName,
+			SubmitByUserId:    campaign.SubmitByUserId,
+			SubmitByUserName:  campaign.SubmitByUserName,
 			RejectionNote:     campaign.RejectionNote,
 			CreatedAt:         campaign.CreatedAt,
 			UpdatedAt:         campaign.UpdatedAt,

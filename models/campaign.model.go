@@ -27,9 +27,10 @@ type Campaign struct {
 	BodyParameter     pq.StringArray `db:"body_parameter"`
 	Status            string         `db:"status"`
 	TemplateId        string         `db:"template_id"`
+	TemplateName      string         `db:"template_name"`
 	RejectionNote     *string        `db:"rejection_note"`
-	SubmitByUserId    string         `db:"submit_by_user_id"`
-	SubmitByUserName  string         `db:"submit_by_user_name"`
+	SubmitByUserId    *string        `db:"submit_by_user_id"`
+	SubmitByUserName  *string        `db:"submit_by_user_name"`
 	CreatedAt         *time.Time     `db:"created_at"`
 	UpdatedAt         *time.Time     `db:"updated_at"`
 }

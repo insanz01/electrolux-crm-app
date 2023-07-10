@@ -25,9 +25,10 @@ type Campaign struct {
 	BodyParameter     []string   `json:"body_parameter"`
 	Status            string     `json:"status"`
 	TemplateId        string     `json:"template_id"`
+	TemplateName      string     `json:"template_name"`
 	RejectionNote     *string    `json:"rejection_note"`
-	SubmitByUserId    string     `json:"submit_by_user_id"`
-	SubmitByUserName  string     `json:"submit_by_user_name"`
+	SubmitByUserId    *string    `json:"submit_by_user_id"`
+	SubmitByUserName  *string    `json:"submit_by_user_name"`
 	CreatedAt         *time.Time `json:"created_at"`
 	UpdatedAt         *time.Time `json:"updated_at"`
 }

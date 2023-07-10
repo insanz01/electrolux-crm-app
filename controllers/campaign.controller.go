@@ -121,6 +121,15 @@ func (cc *campaignController) Insert(c echo.Context) error {
 
 	userInfo := c.Get("auth_token").(*models.AuthSSO)
 
+	fmt.Println(userInfo)
+	if userInfo.User.ID == nil {
+		return c.JSON(http.StatusUnauthorized, models.Response{
+			Status:  0,
+			Message: "invalid sso token data",
+			Data:    nil,
+		})
+	}
+
 	parsedRequest := dto.CampaignParsedRequest{
 		Name:              campaignInsert.Name,
 		ChannelAccountId:  campaignInsert.ChannelAccountId,
@@ -141,6 +150,7 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		BodyParameter:     campaignInsert.BodyParameter,
 		Status:            "WAITING APPROVAL",
 		TemplateId:        campaignInsert.TemplateId,
+		TemplateName:      campaignInsert.TemplateName,
 		SubmitByUserId:    userInfo.User.ID,
 		SubmitByUserName:  userInfo.User.Name,
 	}

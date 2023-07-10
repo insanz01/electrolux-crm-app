@@ -7,8 +7,8 @@ type AuthSSO struct {
 	RefreshToken string `json:"refresh_token"`
 	TokenType    string `json:"token_type"`
 	User         struct {
-		ID           string   `json:"id"`
-		Name         string   `json:"name"`
+		ID           *string  `json:"id"`
+		Name         *string  `json:"name"`
 		Email        string   `json:"email"`
 		Phone        any      `json:"phone"`
 		Roles        []string `json:"roles"`

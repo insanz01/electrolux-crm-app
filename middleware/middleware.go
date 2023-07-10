@@ -34,7 +34,7 @@ func AuthSSO() echo.MiddlewareFunc {
 			ctx := c.Request().Context()
 			newCtx := setTokenToCtx(ctx, *tokenDetail)
 
-			c.Set("auth_token", *tokenDetail)
+			c.Set("auth_token", tokenDetail)
 
 			c.SetRequest(c.Request().WithContext(newCtx))
 
@@ -66,7 +66,7 @@ func EchoMiddleware() echo.MiddlewareFunc {
 	}
 }
 
-func CheckToken(ctx context.Context, token string) (*TokenDetail, error) {
+func CheckToken(ctx context.Context, token string) (*models.AuthSSO, error) {
 	logger := logrus.WithContext(ctx).WithFields(logrus.Fields{
 		"method": "CheckToken",
 		"token":  token,
@@ -114,7 +114,7 @@ func CheckToken(ctx context.Context, token string) (*TokenDetail, error) {
 	}
 }
 
-func setTokenToCtx(ctx context.Context, token TokenDetail) context.Context {
+func setTokenToCtx(ctx context.Context, token models.AuthSSO) context.Context {
 	return context.WithValue(ctx, AuthTokenKey, token)
 }
 
@@ -127,8 +127,8 @@ func handleCheckTokenErrorResponse(body io.ReadCloser) error {
 	return fmt.Errorf("failed to check token: message: %s status: %s code: %s ", resp.Message, resp.Status, resp.Code)
 }
 
-func handleCheckTokenResponse(body io.ReadCloser) (*TokenDetail, error) {
-	var resp *TokenDetail
+func handleCheckTokenResponse(body io.ReadCloser) (*models.AuthSSO, error) {
+	var resp *models.AuthSSO
 	if err := json.NewDecoder(body).Decode(&resp); err != nil {
 		return nil, err
 	}

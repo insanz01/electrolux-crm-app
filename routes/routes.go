@@ -137,6 +137,8 @@ func Init() *echo.Echo {
 
 	api.GET("/lists", customerController.List)
 
+	// api.GET("/")
+
 	api.GET("/test-struct-validation", controllers.TestStructValidation)
 	api.GET("/test-variable-validation", controllers.TestVariableValidation)
 

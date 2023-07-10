@@ -24,8 +24,9 @@ type CampaignInsertRequest struct {
 	BodyParameter     []string `json:"body_parameter"`
 	Status            string   `json:"status"`
 	TemplateId        string   `json:"template_id"`
-	SubmitByUserId    string   `json:"submit_by_user_id"`
-	SubmitByUserName  string   `json:"submit_by_user_name"`
+	TemplateName      string   `json:"template_name"`
+	SubmitByUserId    *string  `json:"submit_by_user_id"`
+	SubmitByUserName  *string  `json:"submit_by_user_name"`
 }
 
 type CampaignParsedRequest struct {
@@ -48,8 +49,9 @@ type CampaignParsedRequest struct {
 	BodyParameter     []string   `json:"body_parameter"`
 	Status            string     `json:"status"`
 	TemplateId        string     `json:"template_id"`
-	SubmitByUserId    string     `json:"submit_by_user_id"`
-	SubmitByUserName  string     `json:"submit_by_user_name"`
+	TemplateName      string     `json:"template_name"`
+	SubmitByUserId    *string    `json:"submit_by_user_id"`
+	SubmitByUserName  *string    `json:"submit_by_user_name"`
 }
 
 type CampaignInsertV2Request struct {
@@ -68,6 +70,7 @@ type CampaignInsertV2Request struct {
 	ServiceType      string `json:"service_type"`
 	Status           string `json:"status"`
 	TemplateId       string `json:"template_id"`
+	TemplateName     string `json:"template_name"`
 }
 
 type CampaignFilter struct {
