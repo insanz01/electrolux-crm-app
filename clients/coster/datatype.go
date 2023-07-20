@@ -52,3 +52,19 @@ type Template struct {
 		} `json:"data"`
 	} `json:"messages"`
 }
+
+type Division struct {
+	Meta struct {
+		Version string `json:"version"`
+		Author  string `json:"author"`
+	} `json:"meta"`
+	ID          string `json:"id"`
+	ReferenceID int    `json:"reference_id"`
+	Name        string `json:"name"`
+	Client      struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"client"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy string    `json:"created_by"`
+}

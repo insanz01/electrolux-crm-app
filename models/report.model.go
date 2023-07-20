@@ -6,6 +6,7 @@ type Report struct {
 	ChannelId    string `db:"channel_account_id"`
 	ChannelName  string `db:"channel_name"`
 	ClientId     string `db:"client_id"`
+	ClientName   string `db:"client_name"`
 	Division     string `db:"division"` // client
 	CreatedDate  string `db:"created_at"`
 	Status       string `db:"status"` // campaign status

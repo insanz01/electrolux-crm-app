@@ -109,12 +109,14 @@ func (cc *campaignController) Insert(c echo.Context) error {
 	}
 
 	scheduledDate, err := time.Parse("2006-01-02", campaignInsert.ScheduleDate)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, models.Response{
-			Status:  0,
-			Message: "invalid scheduled date value",
-			Data:    nil,
-		})
+	if campaignInsert.ScheduleDate != "" {
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, models.Response{
+				Status:  0,
+				Message: "invalid scheduled date value",
+				Data:    nil,
+			})
+		}
 	}
 
 	fmt.Println(campaignInsert)

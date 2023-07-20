@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/clients/coster"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/repository"
@@ -13,9 +14,10 @@ type FileService interface {
 	GetAllDocument(c echo.Context) ([]*dto.FileResponse, error)
 	GetAllDocumentWithFilter(c echo.Context, filters dto.FileFilterRequest) ([]*dto.FileResponse, error)
 	GetDocument(c echo.Context, uuid string) (*dto.FileResponse, error)
-	Insert(c echo.Context, fileUpload dto.FileRequest, userInfo models.AuthSSO) (*dto.FileResponse, error)
+	Insert(c echo.Context, fileUpload dto.FileRequest, userInfo *models.AuthSSO, division *coster.Division) (*dto.FileResponse, error)
 	GetAllInvalidDocument(c echo.Context) ([]*dto.InvalidFileResponse, error)
 	GetInvalidDocument(c echo.Context, uuid string) (*dto.InvalidFileResponse, error)
+	List(c echo.Context, property string) (*dto.FileListResponse, error)
 }
 
 type fileService struct {
@@ -52,16 +54,29 @@ func (fs *fileService) GetAllDocument(c echo.Context) ([]*dto.FileResponse, erro
 			invalidFile.FilePath = url + *file.InvalidFilename
 		}
 
+		divisionId := ""
+		divisionName := ""
+		if file.UploadByDivisionId != nil {
+			divisionId = *file.UploadByDivisionId
+		}
+		if file.UploadByDivisionName != nil {
+			divisionName = *file.UploadByDivisionName
+		}
+
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:         file.Id,
-			Filename:     file.Filename,
-			NumOfFailed:  file.NumOfFailed,
-			NumOfSuccess: file.NumOfSuccess,
-			Status:       file.Status,
-			Category:     file.Category,
-			FilePath:     url + file.Filename,
-			InvalidFile:  &invalidFile,
-			UpdatedAt:    file.UpdatedAt,
+			UUID:                 file.Id,
+			Filename:             file.Filename,
+			NumOfFailed:          file.NumOfFailed,
+			NumOfSuccess:         file.NumOfSuccess,
+			Status:               file.Status,
+			Category:             file.Category,
+			FilePath:             url + file.Filename,
+			InvalidFile:          &invalidFile,
+			UpdatedAt:            file.UpdatedAt,
+			UploadByUserId:       *file.UploadByUserId,
+			UploadByUserName:     *file.UploadByUserName,
+			UploadByDivisionId:   divisionId,
+			UploadByDivisionName: divisionName,
 		})
 	}
 
@@ -93,15 +108,19 @@ func (fs *fileService) GetAllDocumentWithFilter(c echo.Context, filter dto.FileF
 		}
 
 		fileResponse = append(fileResponse, &dto.FileResponse{
-			UUID:         file.Id,
-			Filename:     file.Filename,
-			NumOfFailed:  file.NumOfFailed,
-			NumOfSuccess: file.NumOfSuccess,
-			Status:       file.Status,
-			Category:     file.Category,
-			FilePath:     url + file.Filename,
-			InvalidFile:  &invalidFile,
-			UpdatedAt:    file.UpdatedAt,
+			UUID:                 file.Id,
+			Filename:             file.Filename,
+			NumOfFailed:          file.NumOfFailed,
+			NumOfSuccess:         file.NumOfSuccess,
+			Status:               file.Status,
+			Category:             file.Category,
+			FilePath:             url + file.Filename,
+			InvalidFile:          &invalidFile,
+			UpdatedAt:            file.UpdatedAt,
+			UploadByUserId:       *file.UploadByUserId,
+			UploadByUserName:     *file.UploadByUserName,
+			UploadByDivisionId:   *file.UploadByDivisionId,
+			UploadByDivisionName: *file.UploadByDivisionName,
 		})
 	}
 
@@ -138,15 +157,17 @@ func (fs *fileService) GetDocument(c echo.Context, uuid string) (*dto.FileRespon
 	return &fileResponse, nil
 }
 
-func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest, userInfo models.AuthSSO) (*dto.FileResponse, error) {
+func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest, userInfo *models.AuthSSO, division *coster.Division) (*dto.FileResponse, error) {
 	inputFile := models.FileExcelDocument{
-		Filename:         fileUpload.File.Filename,
-		Category:         fileUpload.Category,
-		NumOfFailed:      0,
-		NumOfSuccess:     0,
-		Status:           "process",
-		UploadByUserId:   userInfo.User.ID,
-		UploadByUserName: userInfo.User.Name,
+		Filename:             fileUpload.File.Filename,
+		Category:             fileUpload.Category,
+		NumOfFailed:          0,
+		NumOfSuccess:         0,
+		Status:               "process",
+		UploadByUserId:       userInfo.User.ID,
+		UploadByUserName:     userInfo.User.Name,
+		UploadByDivisionId:   &division.ID,
+		UploadByDivisionName: &division.Name,
 	}
 
 	fmt.Println(inputFile)
@@ -158,9 +179,11 @@ func (fs *fileService) Insert(c echo.Context, fileUpload dto.FileRequest, userIn
 	}
 
 	response := dto.FileResponse{
-		UUID:     uuid,
-		Filename: fileUpload.File.Filename,
-		Status:   "process",
+		UUID:             uuid,
+		Filename:         fileUpload.File.Filename,
+		Status:           "process",
+		UploadByUserId:   *inputFile.UploadByUserId,
+		UploadByUserName: *inputFile.UploadByUserName,
 	}
 
 	return &response, nil
@@ -219,4 +242,28 @@ func (fs *fileService) GetInvalidDocument(c echo.Context, uuid string) (*dto.Inv
 	}
 
 	return &fileResponse, nil
+}
+
+func (fs *fileService) List(c echo.Context, property string) (*dto.FileListResponse, error) {
+	lists, err := fs.repository.GetAllFile()
+	if err != nil {
+		return nil, err
+	}
+
+	listResponse := []string{}
+	unique := make(map[string]bool)
+	for _, list := range lists {
+		divisionName := ""
+		if list.UploadByDivisionName != nil {
+			divisionName = *list.UploadByDivisionName
+		}
+		if !unique[divisionName] && divisionName != "" {
+			unique[divisionName] = true
+			listResponse = append(listResponse, divisionName)
+		}
+	}
+
+	return &dto.FileListResponse{
+		ListData: listResponse,
+	}, nil
 }

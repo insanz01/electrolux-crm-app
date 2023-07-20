@@ -18,10 +18,10 @@ type FileRepository interface {
 }
 
 const (
-	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status, upload_by_user_id, upload_by_user_name) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status, :upload_by_user_id, :upload_by_user_name) returning id"
-	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
-	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, created_at, updated_at, deleted_at FROM public.excel_document WHERE deleted_at is NULL"
-	getAllFileV2Query      = "SELECT ed.id, ed.filename, ed.category, ed.num_of_failed, ed.num_of_success, ed.status, edi.filename as invalid_filename, edi.is_valid, ed.created_at, ed.updated_at, ed.deleted_at FROM public.excel_document ed LEFT JOIN public.excel_document_invalid edi ON ed.id = edi.id WHERE ed.deleted_at is NULL"
+	insertFileQuery        = "INSERT INTO excel_document (filename, category, num_of_failed, num_of_success, status, upload_by_user_id, upload_by_user_name, upload_by_division_id, upload_by_division_name) VALUES (:filename, :category, :num_of_failed, :num_of_success, :status, :upload_by_user_id, :upload_by_user_name, :upload_by_division_id, :upload_by_division_name) returning id"
+	getFileQuery           = "SELECT id, filename, category, num_of_failed, num_of_success, status,upload_by_user_id, upload_by_user_name, upload_by_division_id, upload_by_division_name, created_at, updated_at, deleted_at FROM public.excel_document WHERE id = $1"
+	getAllFileQuery        = "SELECT id, filename, category, num_of_failed, num_of_success, status, upload_by_user_id, upload_by_user_name, upload_by_division_id, upload_by_division_name, created_at, updated_at, deleted_at FROM public.excel_document WHERE deleted_at is NULL"
+	getAllFileV2Query      = "SELECT ed.id, ed.filename, ed.category, ed.num_of_failed, ed.num_of_success, ed.status, ed.upload_by_user_id, ed.upload_by_user_name, ed.upload_by_division_id, ed.upload_by_division_name, edi.filename as invalid_filename, edi.is_valid, ed.created_at, ed.updated_at, ed.deleted_at FROM public.excel_document ed LEFT JOIN public.excel_document_invalid edi ON ed.id = edi.id WHERE ed.deleted_at is NULL"
 	getInvalidFileQuery    = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid WHERE id = $1"
 	getAllInvalidFileQuery = "SELECT id, excel_document_id, filename, is_valid, created_at, updated_at, deleted_at FROM public.excel_document_invalid"
 )
@@ -82,6 +82,10 @@ func (r *Repository) GetAllFileWithFilter(filters []*dto.FileFilter) ([]*models.
 			filterQuery = fmt.Sprintf("%s AND public.excel_document.status = '%s'", filterQuery, filter.Value)
 		case "upload_at":
 			filterQuery = fmt.Sprintf("%s AND DATE(public.excel_document.created_at) = DATE('%s')", filterQuery, filter.Value)
+		case "upload_by":
+			filterQuery = fmt.Sprintf("%s AND public.excel_document.upload_by_user_name = '%s'", filterQuery, filter.Value)
+		case "division":
+			filterQuery = fmt.Sprintf("%s AND public.excel_document.upload_by_division_name = '%s'", filterQuery, filter.Value)
 		}
 	}
 

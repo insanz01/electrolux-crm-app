@@ -45,7 +45,7 @@ func (r *Repository) GetAllGiftClaimWithFilter(properties dto.GiftClaimPropertie
 	var giftClaims []*models.GiftProperties
 
 	finalQuery := getAllGiftWithFilterQuery
-	var tableIds []*string
+	var tableIds []string
 
 	useFilter := false
 	useProperties := false

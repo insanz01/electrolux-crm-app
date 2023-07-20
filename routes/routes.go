@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	// "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/middleware"
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/clients/coster"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/controllers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/db"
 	_ "git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/docs"
@@ -48,9 +49,11 @@ func Init() *echo.Echo {
 	clientService := services.NewClientService(repo)
 	channelService := services.NewChannelService(repo)
 
+	costerClient := coster.NewCosterClient()
+
 	loginController := controllers.NewLoginController(repo)
 	customerController := controllers.NewCustomerController(customerService)
-	fileController := controllers.NewFileController(fileService)
+	fileController := controllers.NewFileController(fileService, costerClient)
 	giftController := controllers.NewGiftController(giftService)
 	campaignController := controllers.NewCampaignController(campaignService)
 	productLineController := controllers.NewProductLineController(productLineService)
@@ -81,6 +84,7 @@ func Init() *echo.Echo {
 	e.GET("/assets/:filename", fileController.Download)
 
 	api := e.Group("api/v1", authMiddleware.AuthSSO())
+	// api := e.Group("api/v1")
 
 	api.GET("/", func(c echo.Context) error {
 		userInfo := c.Get("auth_token")
@@ -88,6 +92,9 @@ func Init() *echo.Echo {
 
 		return c.String(http.StatusOK, "Hello, this is echo!")
 	})
+
+	fileApi := e.Group("file/v1")
+	fileApi.GET("/files/:uuid", fileController.GetFile)
 
 	api.GET("/generate-hash/:password", loginController.GenerateHashPassword)
 	api.POST("/login", loginController.CheckLogin)
@@ -116,12 +123,6 @@ func Init() *echo.Echo {
 	api.GET("/campaigns/:summary_id/customers", campaignController.Customer)
 	api.GET("/campaigns/:summary_id/customers/filter", campaignController.FilterCustomer)
 
-	api.GET("/files", fileController.GetAllFile)
-	api.POST("/files/filter", fileController.GetAllFileFilter)
-	api.POST("/files", fileController.Upload)
-	api.GET("/files/:uuid", fileController.GetFile)
-	api.GET("/files/invalid", fileController.GetAllInvalidFile)
-
 	api.GET("/reports", reportController.FindAll)
 	api.GET("/reports/:campaign_id", reportController.Download)
 	api.POST("/reports/filter", reportController.Filter)
@@ -136,6 +137,12 @@ func Init() *echo.Echo {
 	api.GET("/clients", clientController.FindAll)
 
 	api.GET("/lists", customerController.List)
+
+	api.GET("/files", fileController.GetAllFile)
+	api.POST("/files", fileController.Upload)
+	api.POST("/files/filter", fileController.GetAllFileFilter)
+	api.GET("/files/invalid", fileController.GetAllInvalidFile)
+	api.GET("/files/lists", fileController.List)
 
 	// api.GET("/")
 

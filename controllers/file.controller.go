@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/clients/coster"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
@@ -21,17 +22,20 @@ type FileController interface {
 	GetAllInvalidFile(c echo.Context) error
 	GetFile(c echo.Context) error
 	Download(c echo.Context) error
+	List(c echo.Context) error
 }
 
 type (
 	fileController struct {
-		fileService services.FileService
+		fileService  services.FileService
+		costerClient coster.CosterClient
 	}
 )
 
-func NewFileController(service services.FileService) FileController {
+func NewFileController(service services.FileService, costerClient coster.CosterClient) FileController {
 	return &fileController{
-		fileService: service,
+		fileService:  service,
+		costerClient: costerClient,
 	}
 }
 
@@ -127,6 +131,8 @@ func (fc *fileController) Upload(c echo.Context) error {
 	}
 
 	userInfo := c.Get("auth_token").(*models.AuthSSO)
+
+	fmt.Println(userInfo)
 	if userInfo == nil {
 		return c.JSON(http.StatusUnauthorized, models.Response{
 			Status:  0,
@@ -135,7 +141,26 @@ func (fc *fileController) Upload(c echo.Context) error {
 		})
 	}
 
-	fileResponse, err := fc.fileService.Insert(c, fileUpload, *userInfo)
+	if userInfo.User.ID == nil {
+		return c.JSON(http.StatusUnauthorized, models.Response{
+			Status:  0,
+			Message: "invalid sso token",
+			Data:    nil,
+		})
+	}
+
+	division, err := fc.costerClient.FindDivisionById(c, fileUpload.DivisionId)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, models.Response{
+			Status:  0,
+			Message: "invalid division id",
+			Data:    nil,
+		})
+	}
+
+	fmt.Println(division)
+
+	fileResponse, err := fc.fileService.Insert(c, fileUpload, userInfo, division)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"status":  0,
@@ -278,4 +303,33 @@ func (fc *fileController) GetFile(c echo.Context) error {
 
 	// Mengirimkan file sebagai respons HTTP
 	return c.Stream(http.StatusOK, "application/octet-stream", file)
+}
+
+func (fc *fileController) List(c echo.Context) error {
+	listProperty := dto.ListProperty{}
+
+	c.Bind(&listProperty)
+
+	if listProperty.Property == nil {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid body request",
+			Data:    nil,
+		})
+	}
+
+	listData, err := fc.fileService.List(c, *listProperty.Property)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			Status:  0,
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, models.Response{
+		Status:  1,
+		Message: "success",
+		Data:    listData,
+	})
 }

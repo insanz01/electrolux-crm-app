@@ -57,7 +57,7 @@ func (r *Repository) GetAllWithFilter(properties dto.CustomerProperties) ([]*mod
 	var customers []*models.CustomerProperties
 
 	finalQuery := getAllWithFilterQuery
-	var tableIds []*string
+	var tableIds []string
 
 	useFilter := false
 	useProperties := false

@@ -101,14 +101,14 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	}
 
 	// segment ini belum ditambahkan
-	client, _ := r.repository.GetSingleClient(campaign.ClientId)
+	// client, _ := r.repository.GetSingleClient(campaign.ClientId)
 
-	clientName := ""
-	if client != nil {
-		clientName = client.Name
-	}
+	// clientName := ""
+	// if client != nil {
+	// 	clientName = client.Name
+	// }
 
-	fmt.Println(clientName)
+	// fmt.Println(clientName)
 	// akhir dari segment client
 
 	singleCampaign := dto.Campaign{
@@ -128,10 +128,14 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
 		ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
 		ServiceType:       campaign.ServiceType,
+		HeaderParameter:   campaign.HeaderParameter,
+		BodyParameter:     campaign.BodyParameter,
 		Status:            campaign.Status,
 		TemplateId:        campaign.TemplateId,
 		TemplateName:      campaign.TemplateName,
 		RejectionNote:     campaign.RejectionNote,
+		SubmitByUserId:    campaign.SubmitByUserId,
+		SubmitByUserName:  campaign.SubmitByUserName,
 		CreatedAt:         campaign.CreatedAt,
 		UpdatedAt:         campaign.UpdatedAt,
 	}
@@ -242,6 +246,8 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		PurchaseEndDate:   campaignRequest.PurchaseEndDate.Format("2006-01-02"),
 		ScheduleDate:      campaignRequest.ScheduleDate.Format("2006-01-02"),
 		ServiceType:       campaignRequest.ServiceType,
+		HeaderParameter:   campaignRequest.HeaderParameter,
+		BodyParameter:     campaignRequest.BodyParameter,
 		Status:            campaignRequest.Status,
 		TemplateId:        campaignRequest.TemplateId,
 		TemplateName:      campaignRequest.TemplateName,

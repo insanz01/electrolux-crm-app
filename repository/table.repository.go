@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/helpers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 )
@@ -38,35 +39,55 @@ func (r *Repository) CountTableId(tableId string) (int, error) {
 	return len(data), nil
 }
 
-func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]*string, error) {
-	var tableIds []*string
+func (r *Repository) GetTableIdByValue(filter []*dto.CustomerFilter) ([]string, error) {
+	var tableIds []string
+	var allTableIds [][]string
 
 	additionalQuery := ""
 
 	for idx, f := range filter {
 
-		logicalOperator := " OR"
+		if f.Value != "" {
+			// logicalOperator := " OR"
+			logicalOperator := " AND" // additional
 
-		if idx == 0 {
-			logicalOperator = " AND ("
+			if idx == 0 {
+				// logicalOperator = " AND ("
+				logicalOperator = " AND"
+			}
+
+			keyProperty := fmt.Sprintf(" (LOWER(public.properties.key) = LOWER('%s')", f.Property)
+			valueProperty := fmt.Sprintf(" AND LOWER(public.properties.value) = LOWER('%s'))", f.Value)
+
+			// additionalQuery = fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty)
+			whereQuery := fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty) // additional
+
+			// finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, additionalQuery)
+			finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, whereQuery) // additional
+
+			fmt.Println(finalQuery)
+
+			err := r.db.Select(&tableIds, finalQuery) // additional
+			if err != nil {
+				return nil, err
+			}
+
+			allTableIds = append(allTableIds, tableIds)
 		}
-
-		keyProperty := fmt.Sprintf(" (LOWER(public.properties.key) = LOWER('%s')", f.Property)
-		valueProperty := fmt.Sprintf(" AND LOWER(public.properties.value) = LOWER('%s'))", f.Value)
-
-		additionalQuery = fmt.Sprintf("%s%s%s%s", additionalQuery, logicalOperator, keyProperty, valueProperty)
 	}
 
-	additionalQuery = fmt.Sprintf("%s)", additionalQuery)
+	// additionalQuery = fmt.Sprintf("%s)", additionalQuery)
 
-	finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, additionalQuery)
+	// finalQuery := fmt.Sprintf("%s%s", getTableIdsQuery, additionalQuery)
 
-	err := r.db.Select(&tableIds, finalQuery)
-	if err != nil {
-		return nil, err
-	}
+	// fmt.Println(finalQuery)
 
-	return tableIds, err
+	// err := r.db.Select(&tableIds, finalQuery)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return helpers.FindCommonStrings(allTableIds), nil
 }
 
 func (r *Repository) FindIdTableCategoryByName(name string) (*models.TableCategory, error) {

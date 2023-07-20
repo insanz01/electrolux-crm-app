@@ -67,5 +67,6 @@ type CampaignFilterProperties struct {
 type CampaignStatus struct {
 	CampaignId string  `db:"campaign_id"`
 	State      string  `db:"state"`
-	Note       *string `db:"rejection_note"`
+	Note       *string `db:"note"`
+	ApprovedAt *string `db:"approved_at"`
 }

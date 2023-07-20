@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/helpers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
-	"github.com/jmoiron/sqlx"
 )
 
 type CampaignRepository interface {
@@ -24,12 +24,13 @@ type CampaignRepository interface {
 const (
 	getAllCampaignQuery           = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE deleted_at is NULL ORDER BY created_at DESC"
 	getAllCampaignWithFilterQuery = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE deleted_at is NULL"
-	getSingleCampaignQuery        = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE public.campaign.id = $1"
+	getSingleCampaignQuery        = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE public.campaign.id = $1"
 	insertCampaignQuery           = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, submit_by_user_id, submit_by_user_name) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :header_parameter, :body_parameter, :status, :template_id, :template_name, :submit_by_user_id, :submit_by_user_name) returning id"
 	insertCampaignSummaryQuery    = "INSERT INTO public.campaign_summary (campaign_id, failed_sent, success_sent, status) VALUES (:campaign_id, :failed_sent, :success_sent, :status) returning id"
 	insertCampaignCustomerQuery   = "INSERT INTO public.campaign_customer (summary_id, customer_id, sent_at, delivered_at, read_at) VALUES (:summary_id, :customer_id, :sent_at, :delivered_at, :read_at) returning id"
 
-	getAllUserByCampaignQuery = "SELECT DISTINCT p.table_data_id FROM public.properties as p WHERE p.value IN (?)"
+	// getAllUserByCampaignQuery = "SELECT DISTINCT p.table_data_id FROM public.properties as p WHERE p.value IN (?)"
+	getAllUserByCampaignQuery = "SELECT DISTINCT p.table_data_id FROM public.properties as p"
 
 	getAllSummaryByCampaignIdQuery         = "SELECT s.id, s.campaign_id, s.failed_sent, s.success_sent, s.status, s.created_at, s.updated_at FROM campaign_summary s WHERE s.deleted_at is NULL AND s.campaign_id = $1"
 	getAllCustomerCampaignBySummaryIdQuery = "SELECT cc.id, cc.summary_id, cc.customer_id, cc.sent_at, cc.delivered_at, cc.read_at FROM campaign_customer cc WHERE cc.summary_id = $1"
@@ -37,6 +38,7 @@ const (
 
 	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
 	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, rejection_note = :note, updated_at = NOW() WHERE id = :campaign_id"
+	updateCampaignApproveQuery       = "UPDATE public.campaign SET status = :state, approved_at = NOW(), updated_at = NOW() WHERE id = :campaign_id"
 
 	updateSummaryCampaignStateQuery = "UPDATE public.campaign_summary SET status = :state, updated_at = NOW() WHERE campaign_id = :campaign_id"
 )
@@ -122,38 +124,57 @@ func (r *Repository) CreateBatchCustomerCampaign(campaignSummaryId string, filte
 	return "", nil
 }
 
+// func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterProperties) ([]string, error) {
+// 	var customers []*models.CustomerProperties
+
+// 	finalQuery := getAllUserByCampaignQuery
+
+// 	// Persiapan query
+// 	query, args, err := sqlx.In(finalQuery, filters.Filters)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	query = sqlx.Rebind(sqlx.DOLLAR, query)
+// 	// fmt.Printf("filters: %v\n", filters)
+
+// 	// Eksekusi query
+// 	err = r.db.Select(&customers, query, args...)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	uuidString := []string{}
+
+// 	for _, customer := range customers {
+// 		uuidString = append(uuidString, customer.TableDataID)
+// 	}
+
+// 	return uuidString, err
+// }
+
 func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterProperties) ([]string, error) {
-	var customers []*models.CustomerProperties
+	var tableIds []string
+	var allTableIds [][]string
 
 	finalQuery := getAllUserByCampaignQuery
-	// filterDateQuery := "AND DATE(p.value) BETWEEN ? AND ?"
 
-	// finalQuery = fmt.Sprintf("%s %s", finalQuery, filterDateQuery)
-	// Persiapan query
-	// query, args, err := sqlx.In(finalQuery, filters.Filters, filters.DateRange.StartDate, filters.DateRange.EndDate)
-	query, args, err := sqlx.In(finalQuery, filters.Filters)
-	if err != nil {
-		return nil, err
+	for _, filter := range filters.Filters {
+		additionalQuery := fmt.Sprintf(" WHERE p.value = '%s'", filter)
+
+		finalQuery = fmt.Sprintf("%s%s", finalQuery, additionalQuery)
+
+		err := r.db.Select(&tableIds, finalQuery)
+		if err != nil {
+			return nil, err
+		}
+
+		allTableIds = append(allTableIds, tableIds)
 	}
 
-	query = sqlx.Rebind(sqlx.DOLLAR, query)
+	uuidString := helpers.FindCommonStrings(allTableIds)
 
-	// fmt.Printf("filters: %v\n", filters)
-	// fmt.Println("query:", query)
-
-	// Eksekusi query
-	err = r.db.Select(&customers, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	uuidString := []string{}
-
-	for _, customer := range customers {
-		uuidString = append(uuidString, customer.TableDataID)
-	}
-
-	return uuidString, err
+	return uuidString, nil
 }
 
 func (r *Repository) createCustomerCampaign(campaignCustomer models.CampaignCustomer) (string, error) {
@@ -235,6 +256,10 @@ func (r *Repository) GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]
 			if f.Value != "" {
 				query = fmt.Sprintf("%s AND date(created_at) = date('%s')", query, f.Value)
 			}
+		case "submit_by":
+			if f.Value != "" {
+				query = fmt.Sprintf("%s AND submit_by_user_name = '%s'", query, f.Value)
+			}
 		}
 	}
 
@@ -259,6 +284,10 @@ func (r *Repository) UpdateState(status models.CampaignStatus) error {
 
 	if status.State == "REJECTED" && status.Note != nil {
 		finalQuery = updateCampaignStateWithNoteQuery
+	}
+
+	if status.State == "ON GOING" {
+		finalQuery = updateCampaignApproveQuery
 	}
 
 	_, err := r.db.NamedExec(finalQuery, status)
