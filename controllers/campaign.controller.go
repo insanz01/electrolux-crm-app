@@ -150,6 +150,8 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		ServiceType:       campaignInsert.ServiceType,
 		HeaderParameter:   campaignInsert.HeaderParameter,
 		BodyParameter:     campaignInsert.BodyParameter,
+		MediaParameter:    campaignInsert.MediaParameter,
+		ButtonParameter:   campaignInsert.ButtonParameter,
 		Status:            "WAITING APPROVAL",
 		TemplateId:        campaignInsert.TemplateId,
 		TemplateName:      campaignInsert.TemplateName,

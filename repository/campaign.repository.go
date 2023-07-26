@@ -22,10 +22,10 @@ type CampaignRepository interface {
 }
 
 const (
-	getAllCampaignQuery           = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE deleted_at is NULL ORDER BY created_at DESC"
+	getAllCampaignQuery           = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, media_parameter, button_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE deleted_at is NULL ORDER BY created_at DESC"
 	getAllCampaignWithFilterQuery = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE deleted_at is NULL"
-	getSingleCampaignQuery        = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE public.campaign.id = $1"
-	insertCampaignQuery           = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, status, template_id, template_name, submit_by_user_id, submit_by_user_name) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :header_parameter, :body_parameter, :status, :template_id, :template_name, :submit_by_user_id, :submit_by_user_name) returning id"
+	getSingleCampaignQuery        = "SELECT id, name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, media_parameter, button_parameter, status, template_id, template_name, rejection_note, submit_by_user_id, submit_by_user_name, created_at, updated_at FROM public.campaign WHERE public.campaign.id = $1"
+	insertCampaignQuery           = "INSERT INTO public.campaign (name, channel_account_id, client_id, city, count_repeat, num_of_occurence, is_repeated, is_scheduled, model_type, product_line, purchase_start_date, purchase_end_date, repeat_type, schedule_date, service_type, header_parameter, body_parameter, media_parameter, button_parameter, status, template_id, template_name, submit_by_user_id, submit_by_user_name) VALUES (:name, :channel_account_id, :client_id, :city, :count_repeat, :num_of_occurence, :is_repeated, :is_scheduled, :model_type, :product_line, :purchase_start_date, :purchase_end_date, :repeat_type, :schedule_date, :service_type, :header_parameter, :body_parameter, :media_parameter, :button_parameter, :status, :template_id, :template_name, :submit_by_user_id, :submit_by_user_name) returning id"
 	insertCampaignSummaryQuery    = "INSERT INTO public.campaign_summary (campaign_id, failed_sent, success_sent, status) VALUES (:campaign_id, :failed_sent, :success_sent, :status) returning id"
 	insertCampaignCustomerQuery   = "INSERT INTO public.campaign_customer (summary_id, customer_id, sent_at, delivered_at, read_at) VALUES (:summary_id, :customer_id, :sent_at, :delivered_at, :read_at) returning id"
 
@@ -157,15 +157,17 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 	var tableIds []string
 	var allTableIds [][]string
 
-	finalQuery := getAllUserByCampaignQuery
+	tempFinal := getAllUserByCampaignQuery
 
 	for _, filter := range filters.Filters {
 		additionalQuery := fmt.Sprintf(" WHERE p.value = '%s'", filter)
 
-		finalQuery = fmt.Sprintf("%s%s", finalQuery, additionalQuery)
+		finalQuery := fmt.Sprintf("%s%s", tempFinal, additionalQuery)
 
 		err := r.db.Select(&tableIds, finalQuery)
 		if err != nil {
+			fmt.Println(finalQuery)
+			fmt.Println("masalah di sini ?")
 			return nil, err
 		}
 

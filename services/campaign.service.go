@@ -321,6 +321,8 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		ServiceType:       campaignRequest.ServiceType,
 		HeaderParameter:   campaignRequest.HeaderParameter,
 		BodyParameter:     campaignRequest.BodyParameter,
+		MediaParameter:    campaignRequest.MediaParameter,
+		ButtonParameter:   campaignRequest.ButtonParameter,
 		Status:            campaignRequest.Status,
 		TemplateId:        campaignRequest.TemplateId,
 		TemplateName:      campaignRequest.TemplateName,
