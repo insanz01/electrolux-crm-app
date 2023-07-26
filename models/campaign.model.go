@@ -23,8 +23,10 @@ type Campaign struct {
 	PurchaseEndDate   *time.Time     `db:"purchase_end_date"`
 	ScheduleDate      *time.Time     `db:"schedule_date"`
 	ServiceType       pq.StringArray `db:"service_type"`
-	HeaderParameter   pq.StringArray `db:"header_parameter"`
-	BodyParameter     pq.StringArray `db:"body_parameter"`
+	HeaderParameter   string         `db:"header_parameter"`
+	BodyParameter     string         `db:"body_parameter"`
+	MediaParameter    string         `db:"media_parameter"`
+	ButtonParameter   string         `db:"button_parameter"`
 	Status            string         `db:"status"`
 	TemplateId        string         `db:"template_id"`
 	TemplateName      string         `db:"template_name"`

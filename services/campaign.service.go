@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -53,6 +54,26 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 		fmt.Println(clientName)
 		// akhir dari segment client
 
+		headerParameter, err := r.parseToArrayString(campaign.HeaderParameter)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		bodyParameter, err := r.parseToArrayString(campaign.BodyParameter)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		mediaParameter, err := r.parseToString(campaign.MediaParameter)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		buttonParameter, err := r.parseToArrayString(campaign.ButtonParameter)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
 		allCampaigns = append(allCampaigns, dto.Campaign{
 			Id:                campaign.Id,
 			Name:              campaign.Name,
@@ -70,8 +91,10 @@ func (r *campaignService) FindAll(c echo.Context) (*dto.CampaignsResponse, error
 			PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
 			ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
 			ServiceType:       campaign.ServiceType,
-			HeaderParameter:   campaign.HeaderParameter,
-			BodyParameter:     campaign.BodyParameter,
+			HeaderParameter:   headerParameter,
+			BodyParameter:     bodyParameter,
+			MediaParameter:    mediaParameter,
+			ButtonParameter:   buttonParameter,
 			Status:            campaign.Status,
 			TemplateId:        campaign.TemplateId,
 			TemplateName:      campaign.TemplateName,
@@ -128,16 +151,16 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
 		ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
 		ServiceType:       campaign.ServiceType,
-		HeaderParameter:   campaign.HeaderParameter,
-		BodyParameter:     campaign.BodyParameter,
-		Status:            campaign.Status,
-		TemplateId:        campaign.TemplateId,
-		TemplateName:      campaign.TemplateName,
-		RejectionNote:     campaign.RejectionNote,
-		SubmitByUserId:    campaign.SubmitByUserId,
-		SubmitByUserName:  campaign.SubmitByUserName,
-		CreatedAt:         campaign.CreatedAt,
-		UpdatedAt:         campaign.UpdatedAt,
+		// HeaderParameter:   campaign.HeaderParameter,
+		// BodyParameter:     campaign.BodyParameter,
+		Status:           campaign.Status,
+		TemplateId:       campaign.TemplateId,
+		TemplateName:     campaign.TemplateName,
+		RejectionNote:    campaign.RejectionNote,
+		SubmitByUserId:   campaign.SubmitByUserId,
+		SubmitByUserName: campaign.SubmitByUserName,
+		CreatedAt:        campaign.CreatedAt,
+		UpdatedAt:        campaign.UpdatedAt,
 	}
 
 	return &dto.CampaignResponse{
@@ -162,14 +185,64 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 		PurchaseEndDate:   campaignRequest.PurchaseEndDate,
 		ScheduleDate:      campaignRequest.ScheduleDate,
 		ServiceType:       campaignRequest.ServiceType,
-		HeaderParameter:   campaignRequest.HeaderParameter,
-		BodyParameter:     campaignRequest.BodyParameter,
-		Status:            campaignRequest.Status,
-		TemplateId:        campaignRequest.TemplateId,
-		TemplateName:      campaignRequest.TemplateName,
-		SubmitByUserId:    campaignRequest.SubmitByUserId,
-		SubmitByUserName:  campaignRequest.SubmitByUserName,
+		// HeaderParameter:   campaignRequest.HeaderParameter,
+		// BodyParameter:     campaignRequest.BodyParameter,
+		Status:           campaignRequest.Status,
+		TemplateId:       campaignRequest.TemplateId,
+		TemplateName:     campaignRequest.TemplateName,
+		SubmitByUserId:   campaignRequest.SubmitByUserId,
+		SubmitByUserName: campaignRequest.SubmitByUserName,
 	}
+
+	headerStruct, err := r.parseToJSONs(campaignRequest.HeaderParameter, "text")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	bodyStruct, err := r.parseToJSONs(campaignRequest.BodyParameter, "text")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	mediaStruct, err := r.parseToJSON(campaignRequest.MediaParameter, "file")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	buttonStruct, err := r.parseToJSONs(campaignRequest.ButtonParameter, "file")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	headerJson, err := json.Marshal(headerStruct)
+	if err != nil {
+		fmt.Println("data header" + err.Error())
+	}
+
+	bodyJson, err := json.Marshal(bodyStruct)
+	if err != nil {
+		fmt.Println("data body" + err.Error())
+	}
+
+	mediaJson, err := json.Marshal(mediaStruct)
+	if err != nil {
+		fmt.Println("data media" + err.Error())
+	}
+
+	buttonJson, err := json.Marshal(buttonStruct)
+	if err != nil {
+		fmt.Println("data button" + err.Error())
+	}
+
+	fmt.Println(headerJson)
+	fmt.Println(bodyJson)
+	fmt.Println(mediaJson)
+	fmt.Println(buttonJson)
+
+	campaignInsert.HeaderParameter = string(headerJson)
+	campaignInsert.BodyParameter = string(bodyJson)
+	campaignInsert.MediaParameter = string(mediaJson)
+	campaignInsert.ButtonParameter = string(buttonJson)
 
 	campaignInsert.Status = "WAITING APPROVAL"
 
@@ -497,4 +570,108 @@ func (cs *campaignService) FilterCustomer(c echo.Context, summaryId string, phon
 	return &dto.CampaignCustomerResponses{
 		CampaignCustomers: customerCampaignResp,
 	}, nil
+}
+
+func (r *campaignService) categoryFile(ext string) string {
+	switch strings.ToLower(ext) {
+	default:
+		return ""
+	case "doc", "docx", "xls", "xlsx", "pdf", "csv", "ppt", "pptx":
+		return "file/documents"
+	case "jpg", "png", "jpeg", "gif", "bmp", "webp", "tiff", "svg", "ico":
+		return "file/image"
+	case "mp4", "avi", "mkv", "mov", "wmv", "flv", "webm", "m4v", "mpeg", "mpg":
+		return "file/video"
+	}
+}
+
+func (r *campaignService) isAcceptedFile(fileName string) (string, bool) {
+	valid := false
+
+	f := strings.Split(fileName, ".")
+
+	fileExt := r.categoryFile(f[len(f)-1])
+
+	if fileExt != "" {
+		valid = true
+	}
+
+	return fileExt, valid
+}
+
+func (r *campaignService) parseToJSON(parameter, typeParameter string) (*models.CampaignJSONParameter, error) {
+	if parameter == "" {
+		return nil, errors.New("tidak ada data parameter")
+	}
+
+	typeData := typeParameter
+
+	if typeParameter == "file" {
+		tempType, isValid := r.isAcceptedFile(parameter)
+		if isValid {
+			typeData = tempType
+		}
+	}
+
+	parameterStruct := models.CampaignJSONParameter{
+		Type:   typeData,
+		Number: 1,
+		Value:  parameter,
+	}
+
+	return &parameterStruct, nil
+}
+
+func (r *campaignService) parseToJSONs(parameters []string, typeParameter string) ([]models.CampaignJSONParameter, error) {
+	parameterStruct := []models.CampaignJSONParameter{}
+
+	for idx, param := range parameters {
+		typeData := typeParameter
+
+		if typeParameter == "file" {
+			tempType, isValid := r.isAcceptedFile(param)
+			if isValid {
+				typeData = tempType
+			}
+		}
+
+		parameterStruct = append(parameterStruct, models.CampaignJSONParameter{
+			Type:   typeData,
+			Number: idx + 1,
+			Value:  param,
+		})
+	}
+
+	if len(parameterStruct) == 0 {
+		return parameterStruct, errors.New("tidak ada data parameter")
+	}
+
+	return parameterStruct, nil
+}
+
+func (r *campaignService) parseToString(jsonString string) (string, error) {
+	var paramVal models.CampaignJSONParameter
+
+	err := json.Unmarshal([]byte(jsonString), &paramVal)
+	if err != nil {
+		return "", err
+	}
+
+	return paramVal.Value, nil
+}
+
+func (r *campaignService) parseToArrayString(jsonString string) ([]string, error) {
+	arrString := []string{}
+	var paramVal []models.CampaignJSONParameter
+
+	err := json.Unmarshal([]byte(jsonString), &paramVal)
+	if err != nil {
+		return []string{}, err
+	}
+
+	for _, param := range paramVal {
+		arrString = append(arrString, param.Value)
+	}
+
+	return arrString, nil
 }

@@ -34,3 +34,9 @@ type KeyValue struct {
 	Key   string `db:"key:"`
 	Value string `db:"value"`
 }
+
+type CampaignJSONParameter struct {
+	Type   string `db:"type"`
+	Number int    `db:"number"`
+	Value  string `db:"value"`
+}

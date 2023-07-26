@@ -22,6 +22,8 @@ type CampaignInsertRequest struct {
 	ServiceType       []string `json:"service_type"`
 	HeaderParameter   []string `json:"header_parameter"`
 	BodyParameter     []string `json:"body_parameter"`
+	MediaParameter    string   `json:"media_parameter"`
+	ButtonParameter   []string `json:"button_parameter"`
 	Status            string   `json:"status"`
 	TemplateId        string   `json:"template_id"`
 	TemplateName      string   `json:"template_name"`
@@ -47,6 +49,8 @@ type CampaignParsedRequest struct {
 	ServiceType       []string   `json:"service_type"`
 	HeaderParameter   []string   `json:"header_parameter"`
 	BodyParameter     []string   `json:"body_parameter"`
+	MediaParameter    string     `json:"media_parameter"`
+	ButtonParameter   []string   `json:"button_parameter"`
 	Status            string     `json:"status"`
 	TemplateId        string     `json:"template_id"`
 	TemplateName      string     `json:"template_name"`
