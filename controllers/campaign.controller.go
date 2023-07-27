@@ -108,8 +108,10 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		})
 	}
 
+	var scheduledDateParsed *time.Time
+
 	scheduledDate, err := time.Parse("2006-01-02", campaignInsert.ScheduleDate)
-	if campaignInsert.ScheduleDate != "" {
+	if campaignInsert.ScheduleDate != "" && campaignInsert.IsScheduled {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, models.Response{
 				Status:  0,
@@ -117,6 +119,10 @@ func (cc *campaignController) Insert(c echo.Context) error {
 				Data:    nil,
 			})
 		}
+	}
+
+	if campaignInsert.IsScheduled {
+		scheduledDateParsed = &scheduledDate
 	}
 
 	// var scheduledDate *time.Time
@@ -154,7 +160,7 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		ProductLine:       campaignInsert.ProductLine,
 		PurchaseStartDate: &purchaseStartDate,
 		PurchaseEndDate:   &purchaseEndDate,
-		ScheduleDate:      &scheduledDate,
+		ScheduleDate:      scheduledDateParsed,
 		ServiceType:       campaignInsert.ServiceType,
 		HeaderParameter:   campaignInsert.HeaderParameter,
 		BodyParameter:     campaignInsert.BodyParameter,

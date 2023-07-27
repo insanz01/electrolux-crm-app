@@ -19,7 +19,7 @@ type Campaign struct {
 	ProductLine       []string   `json:"product_line"`
 	PurchaseStartDate string     `json:"purchase_start_date"`
 	PurchaseEndDate   string     `json:"purchase_end_date"`
-	ScheduleDate      string     `json:"schedule_date"`
+	ScheduleDate      *time.Time `json:"schedule_date"`
 	ServiceType       []string   `json:"service_type"`
 	HeaderParameter   []string   `json:"header_parameter"`
 	BodyParameter     []string   `json:"body_parameter"`
