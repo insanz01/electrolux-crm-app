@@ -134,6 +134,26 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 	// fmt.Println(clientName)
 	// akhir dari segment client
 
+	headerParameter, err := r.parseToArrayString(campaign.HeaderParameter)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	bodyParameter, err := r.parseToArrayString(campaign.BodyParameter)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	mediaParameter, err := r.parseToString(campaign.MediaParameter)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	buttonParameter, err := r.parseToArrayString(campaign.ButtonParameter)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	singleCampaign := dto.Campaign{
 		Id:                campaign.Id,
 		Name:              campaign.Name,
@@ -151,16 +171,18 @@ func (r *campaignService) FindById(c echo.Context, id string) (*dto.CampaignResp
 		PurchaseEndDate:   campaign.PurchaseEndDate.Format("2006-01-02"),
 		ScheduleDate:      campaign.ScheduleDate.Format("2006-01-02"),
 		ServiceType:       campaign.ServiceType,
-		// HeaderParameter:   campaign.HeaderParameter,
-		// BodyParameter:     campaign.BodyParameter,
-		Status:           campaign.Status,
-		TemplateId:       campaign.TemplateId,
-		TemplateName:     campaign.TemplateName,
-		RejectionNote:    campaign.RejectionNote,
-		SubmitByUserId:   campaign.SubmitByUserId,
-		SubmitByUserName: campaign.SubmitByUserName,
-		CreatedAt:        campaign.CreatedAt,
-		UpdatedAt:        campaign.UpdatedAt,
+		HeaderParameter:   headerParameter,
+		BodyParameter:     bodyParameter,
+		MediaParameter:    mediaParameter,
+		ButtonParameter:   buttonParameter,
+		Status:            campaign.Status,
+		TemplateId:        campaign.TemplateId,
+		TemplateName:      campaign.TemplateName,
+		RejectionNote:     campaign.RejectionNote,
+		SubmitByUserId:    campaign.SubmitByUserId,
+		SubmitByUserName:  campaign.SubmitByUserName,
+		CreatedAt:         campaign.CreatedAt,
+		UpdatedAt:         campaign.UpdatedAt,
 	}
 
 	return &dto.CampaignResponse{
@@ -270,19 +292,53 @@ func (r *campaignService) Insert(c echo.Context, campaignRequest dto.CampaignPar
 
 	// add filter list (product line, city/location, service type, model type, purchase date)
 	if len(campaignInsert.ProductLine) > 0 {
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ProductLine...)
+		for _, val := range campaignInsert.ProductLine {
+			objFilter := models.ObjectFilter{
+				Key:   "product_line",
+				Value: val,
+			}
+
+			campaignFilter.Filters = append(campaignFilter.Filters, objFilter)
+		}
+
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ProductLine...)
 	}
 
 	if len(campaignInsert.City) > 0 {
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.City...)
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.City...)
+		for _, val := range campaignInsert.City {
+			objFilter := models.ObjectFilter{
+				Key:   "city",
+				Value: val,
+			}
+
+			campaignFilter.Filters = append(campaignFilter.Filters, objFilter)
+		}
 	}
 
 	if len(campaignInsert.ServiceType) > 0 {
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ServiceType...)
+		for _, val := range campaignInsert.ServiceType {
+			objFilter := models.ObjectFilter{
+				Key:   "service_type",
+				Value: val,
+			}
+
+			campaignFilter.Filters = append(campaignFilter.Filters, objFilter)
+		}
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ServiceType...)
 	}
 
 	if len(campaignInsert.ModelType) > 0 {
-		campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ModelType...)
+		for _, val := range campaignInsert.ModelType {
+			objFilter := models.ObjectFilter{
+				Key:   "model_type",
+				Value: val,
+			}
+
+			campaignFilter.Filters = append(campaignFilter.Filters, objFilter)
+		}
+
+		// campaignFilter.Filters = append(campaignFilter.Filters, campaignInsert.ModelType...)
 	}
 
 	if campaignInsert.PurchaseStartDate != nil {

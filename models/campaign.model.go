@@ -61,8 +61,13 @@ type CampaignDateRange struct {
 	EndDate   *time.Time `db:"purchase_end_date"`
 }
 
+type ObjectFilter struct {
+	Key   string `db:"key"`
+	Value string `db:"value"`
+}
+
 type CampaignFilterProperties struct {
-	Filters   []string          `db:"filters" json:"filters"`
+	Filters   []ObjectFilter    `db:"filters" json:"filters"`
 	DateRange CampaignDateRange `db:"daterange" json:"daterange"`
 }
 

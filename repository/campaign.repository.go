@@ -156,11 +156,14 @@ func (r *Repository) CreateBatchCustomerCampaign(campaignSummaryId string, filte
 func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterProperties) ([]string, error) {
 	var tableIds []string
 	var allTableIds [][]string
+	var uuidStrings []string
+
+	category := make(map[string][]string)
 
 	tempFinal := getAllUserByCampaignQuery
 
 	for _, filter := range filters.Filters {
-		additionalQuery := fmt.Sprintf(" WHERE p.value = '%s'", filter)
+		additionalQuery := fmt.Sprintf(" WHERE p.value = '%s'", filter.Value)
 
 		finalQuery := fmt.Sprintf("%s%s", tempFinal, additionalQuery)
 
@@ -171,12 +174,27 @@ func (r *Repository) getAllCustomerByFilter(filters models.CampaignFilterPropert
 			return nil, err
 		}
 
-		allTableIds = append(allTableIds, tableIds)
+		fmt.Println(finalQuery)
+		fmt.Println(tableIds)
+
+		if len(tableIds) > 0 {
+			category[filter.Key] = append(category[filter.Key], tableIds...)
+
+			allTableIds = append(allTableIds, tableIds)
+		}
+		uuidStrings = append(uuidStrings, tableIds...)
 	}
 
 	uuidString := helpers.FindCommonStrings(allTableIds)
+	uuidStringByCategory := helpers.FindCommonStringsByMap(category)
 
-	return uuidString, nil
+	fmt.Println("category", category)
+
+	fmt.Println("UUID String", uuidString)
+	fmt.Println("UUID String By All String", uuidStrings)
+	fmt.Println("UUID String By Category", uuidStringByCategory)
+
+	return uuidStringByCategory, nil
 }
 
 func (r *Repository) createCustomerCampaign(campaignCustomer models.CampaignCustomer) (string, error) {

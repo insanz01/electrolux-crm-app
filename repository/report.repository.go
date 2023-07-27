@@ -15,9 +15,78 @@ type ReportRepository interface {
 }
 
 const (
-	getAllReportsQuery      = "SELECT campaign.id, campaign.name as campaign_name, campaign.channel_account_id as channel_account_id, channel.name as channel_name, client.coster_id as client_id, client.coster_id as client_name, campaign.created_at, campaign.status FROM campaign JOIN channel ON campaign.channel_account_id = channel.name JOIN client ON campaign.client_id = client.coster_id"
-	getSingleReportsQuery   = "SELECT campaign.id, campaign.name as campaign_name, channel.name as channel_name, channel_account.id as channel_account_id, channel_account.name as channel_account_name, client.id as client_id, client.name as created_by, '' as division, '' as message_id, '' as contact, campaign.template_id, '' as template_name, '' as template_category, '' as template_language, '' as content_type, '' as approved_at, '' as approved_by, '' as wa_id, '' as reply_button, '' as reply_at, campaign.status as state, '' as invalid, campaign_customer.sent_at, campaign_customer.delivered_at, campaign_customer.read_at, campaign_summary.failed_sent as failed_at, '' as failed_detail, campaign.created_at, campaign_customer.customer_id FROM campaign JOIN channel_account ON campaign.channel_account_id = channel_account.id JOIN channel ON channel_account.channel_id = channel.id JOIN client ON campaign.client_id = client.id JOIN campaign_summary ON campaign.id = campaign_summary.campaign_id JOIN campaign_customer ON campaign_summary.id = campaign_customer.summary_id WHERE campaign.deleted_at is null AND campaign.id = $1"
-	getMultipleReportsQuery = "SELECT campaign.id, campaign.name as campaign_name, channel.name as channel_name, channel_account.id as channel_account_id, channel_account.name as channel_account_name, client.id as client_id, client.name as created_by, '' as division, '' as message_id, '' as contact, campaign.template_id, '' as template_name, '' as template_category, '' as template_language, '' as content_type, '' as approved_at, '' as approved_by, '' as wa_id, '' as reply_button, '' as reply_at, campaign.status as state, '' as invalid, campaign_customer.sent_at, campaign_customer.delivered_at, campaign_customer.read_at, campaign_summary.failed_sent as failed_at, '' as failed_detail, campaign.created_at, campaign_customer.customer_id FROM campaign JOIN channel_account ON campaign.channel_account_id = channel_account.id JOIN channel ON channel_account.channel_id = channel.id JOIN client ON campaign.client_id = client.id JOIN campaign_summary ON campaign.id = campaign_summary.campaign_id JOIN campaign_customer ON campaign_summary.id = campaign_customer.summary_id WHERE campaign.deleted_at is null"
+	getAllReportsQuery    = "SELECT campaign.id, campaign.name as campaign_name, campaign.channel_account_id as channel_account_id, channel.name as channel_name, client.coster_id as client_id, client.coster_id as client_name, campaign.created_at, campaign.status FROM campaign JOIN channel ON campaign.channel_account_id = channel.name JOIN client ON campaign.client_id = client.coster_id"
+	getSingleReportsQuery = `SELECT 
+		campaign.id, 
+		campaign.name as campaign_name, 
+		channel.name as channel_name, 
+		channel_account.id as channel_account_id, 
+		channel_account.name as channel_account_name, 
+		campaign.client_id, 
+		campaign.submit_by_user_name as created_by, 
+		'' as division, 
+		'' as message_id, 
+		'' as contact, 
+		campaign.template_id, 
+		campaign.template_name, 
+		'' as template_category, 
+		'id' as template_language, 
+		'' as content_type, 
+		campaign.approved_at, 
+		'' as approved_by, 
+		'' as wa_id, 
+		'' as reply_button, 
+		'' as reply_at, 
+		campaign.status as state, 
+		'' as invalid, 
+		campaign_customer.sent_at, 
+		campaign_customer.delivered_at, 
+		campaign_customer.read_at, 
+		campaign_summary.failed_sent as failed_at, 
+		'' as failed_detail, 
+		campaign.created_at, 
+		campaign_customer.customer_id 
+		FROM campaign 
+		JOIN channel_account 
+		ON campaign.channel_account_id = channel_account.id 
+		JOIN channel 
+		ON channel_account.channel_id = channel.id 
+		JOIN campaign_summary 
+		ON campaign.id = campaign_summary.campaign_id 
+		JOIN campaign_customer 
+		ON campaign_summary.id = campaign_customer.summary_id 
+		WHERE campaign.deleted_at is null AND campaign.id = $1`
+	getMultipleReportsQuery = `SELECT
+	campaign.id, 
+		campaign.name as campaign_name, 
+		channel.name as channel_name, 
+		channel_account.id as channel_account_id, 
+		channel_account.name as channel_account_name, 
+		campaign.client_id, 
+		campaign.submit_by_user_name as created_by,
+		'' as division, 
+		'' as message_id, 
+		'' as contact, 
+		campaign.template_id, 
+		campaign.template_name, 
+		'' as template_category, 
+		'id' as template_language, 
+		'' as content_type, 
+		campaign.approved_at, 
+		'' as approved_by, 
+		'' as wa_id, 
+		'' as reply_button, 
+		'' as reply_at, 
+		campaign.status as state, 
+		'' as invalid, 
+		campaign_customer.sent_at, 
+		campaign_customer.delivered_at, 
+		campaign_customer.read_at, 
+		campaign_summary.failed_sent as failed_at, 
+		'' as failed_detail, 
+		campaign.created_at, 
+		campaign_customer.customer_id 
+	FROM campaign JOIN channel_account ON campaign.channel_account_id = channel_account.id JOIN channel ON channel_account.channel_id = channel.id JOIN client ON campaign.client_id = client.id JOIN campaign_summary ON campaign.id = campaign_summary.campaign_id JOIN campaign_customer ON campaign_summary.id = campaign_customer.summary_id WHERE campaign.deleted_at is null`
 )
 
 func (r *Repository) GetAllReports() ([]*models.Report, error) {

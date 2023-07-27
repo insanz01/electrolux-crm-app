@@ -119,6 +119,14 @@ func (cc *campaignController) Insert(c echo.Context) error {
 		}
 	}
 
+	// var scheduledDate *time.Time
+
+	// if !campaignInsert.IsScheduled {
+	// 	scheduledDate = nil
+	// } else {
+	// 	scheduledDate = &scheduledDateParsed
+	// }
+
 	fmt.Println(campaignInsert)
 
 	userInfo := c.Get("auth_token").(*models.AuthSSO)

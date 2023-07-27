@@ -174,3 +174,28 @@ func FindCommonStrings(arrays [][]string) []string {
 
 	return commonStrings
 }
+
+func FindCommonStringsByMap(arrays map[string][]string) []string {
+	if len(arrays) == 0 {
+		return nil
+	}
+
+	// Membuat map untuk menghitung jumlah kemunculan setiap string
+	countMap := make(map[string]int)
+	for _, array := range arrays {
+		for _, str := range array {
+			countMap[str]++
+		}
+	}
+
+	// Mengumpulkan string yang muncul pada semua array dengan jumlah kemunculan yang sesuai
+	commonStrings := make([]string, 0)
+	numArrays := len(arrays)
+	for str, count := range countMap {
+		if count == numArrays {
+			commonStrings = append(commonStrings, str)
+		}
+	}
+
+	return commonStrings
+}
