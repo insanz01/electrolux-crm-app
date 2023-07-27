@@ -131,6 +131,19 @@ func GetTokenFromHeader(req *http.Request) string {
 	return strings.TrimSpace(authHeader[1])
 }
 
+func AcceptedExcelDocument(fileName string) bool {
+	f := strings.Split(fileName, ".")
+
+	fileExt := f[len(f)-1]
+
+	switch strings.ToLower(fileExt) {
+	default:
+		return false
+	case "xls", "xlsx":
+		return true
+	}
+}
+
 // GenerateOpenAPIResponse generate response for open api in case of a success response
 func GenerateOpenAPIResponse(data interface{}) map[string]any {
 	return map[string]any{

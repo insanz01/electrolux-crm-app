@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/clients/coster"
+	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/helpers"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/models/dto"
 	"git-rbi.jatismobile.com/jatis_electrolux/electrolux-crm/services"
@@ -107,6 +108,14 @@ func (fc *fileController) Upload(c echo.Context) error {
 	dstDir := "uploads"
 	if _, err := os.Stat(dstDir); os.IsNotExist(err) {
 		os.Mkdir(dstDir, 0755)
+	}
+
+	if !helpers.AcceptedExcelDocument(fileUpload.File.Filename) {
+		return c.JSON(http.StatusBadRequest, models.Response{
+			Status:  0,
+			Message: "invalid file extension.",
+			Data:    nil,
+		})
 	}
 
 	// Membuat file tujuan
