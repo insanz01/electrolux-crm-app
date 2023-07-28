@@ -476,10 +476,17 @@ func (cs *campaignService) validateState(state string) bool {
 }
 
 func (cs *campaignService) State(c echo.Context, statusRequest dto.StatusRequest) (*dto.StatusResponse, error) {
+	userInfo := c.Get("auth_token").(*models.AuthSSO)
+
+	if userInfo.User.ID == nil {
+		return nil, errors.New("invalid sso token data")
+	}
+
 	status := models.CampaignStatus{
 		CampaignId: statusRequest.CampaignId,
 		State:      statusRequest.State,
 		Note:       statusRequest.Note,
+		ApprovedBy: userInfo.User.Name,
 	}
 
 	if status.State == "STOP" {

@@ -18,7 +18,7 @@ type CampaignRepository interface {
 	GetSummaryByCampaignId(id string) (*models.Campaign, error)
 	GetCustomersBySummaryId(summaryId string) ([]*models.CampaignCustomer, error)
 	GetAllCampaignWithFilter(filter dto.CampaignProperties) ([]*models.Campaign, error)
-	UpdateState(status models.CampaignStatus) error
+	UpdateState(status models.CampaignStatus, userInfo models.AuthSSO) error
 }
 
 const (
@@ -38,7 +38,7 @@ const (
 
 	updateCampaignStateQuery         = "UPDATE public.campaign SET status = :state, updated_at = NOW() WHERE id = :campaign_id"
 	updateCampaignStateWithNoteQuery = "UPDATE public.campaign SET status = :state, rejection_note = :note, updated_at = NOW() WHERE id = :campaign_id"
-	updateCampaignApproveQuery       = "UPDATE public.campaign SET status = :state, approved_at = NOW(), updated_at = NOW() WHERE id = :campaign_id"
+	updateCampaignApproveQuery       = "UPDATE public.campaign SET status = :state, approved_by = :approved_by, approved_at = NOW(), updated_at = NOW() WHERE id = :campaign_id"
 
 	updateSummaryCampaignStateQuery = "UPDATE public.campaign_summary SET status = :state, updated_at = NOW() WHERE campaign_id = :campaign_id"
 )

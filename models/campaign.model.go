@@ -76,4 +76,5 @@ type CampaignStatus struct {
 	State      string  `db:"state"`
 	Note       *string `db:"note"`
 	ApprovedAt *string `db:"approved_at"`
+	ApprovedBy *string `db:"approved_by"`
 }
